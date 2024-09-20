@@ -21,6 +21,8 @@ export const sidebarLinks = [
   },
 ];
 
+export const AppTitle = 'Vaultify';
+
 // good_user / good_password - Bank of America
 export const TEST_USER_ID = "6627ed3d00267aa6fa3e";
 
@@ -135,3 +137,6 @@ export const transactionCategoryStyles = {
     chipBackgroundColor: "bg-inherit",
   },
 };
+
+export const CardHiddenSymbols = '●●●● ●●●● ●●●●'
+export const ShortCardHiddenSymbols = '●● / ●●'
