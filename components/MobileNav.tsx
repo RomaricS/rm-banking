@@ -3,6 +3,7 @@ import {
     Sheet,
     SheetClose,
     SheetContent,
+    SheetTitle,
     SheetTrigger,
 } from '@/components/ui/sheet';
 import { AppTitle, sidebarLinks } from '@/constants';
@@ -29,19 +30,21 @@ const MobileNav = ({ user }: MobileNavProps) => {
                 <SheetContent
                     side='left'
                     className='border-none bg-white'>
-                    <Link
-                        href='/'
-                        className='cursor-pointer items-center gap-1 flex px-4'>
-                        <Image
-                            src='/icons/logo.svg'
-                            width={34}
-                            height={34}
-                            alt='Main logo'
-                        />
-                        <h1 className='text-26 font-ibm-plex-serif font-bold text-black-1'>
-                            {AppTitle}
-                        </h1>
-                    </Link>
+                    <SheetTitle>
+                        <Link
+                            href='/'
+                            className='cursor-pointer items-center gap-1 flex px-4'>
+                            <Image
+                                src='/icons/logo.svg'
+                                width={34}
+                                height={34}
+                                alt='Main logo'
+                            />
+                            <h1 className='text-26 font-ibm-plex-serif font-bold text-black-1'>
+                                {AppTitle}
+                            </h1>
+                        </Link>
+                    </SheetTitle>
 
                     <div className='mobilenav-sheet'>
                         <SheetClose asChild>
@@ -55,22 +58,25 @@ const MobileNav = ({ user }: MobileNavProps) => {
                                             asChild
                                             key={link.route}>
                                             <Link
-                                                className={cn('mobilenav-sheet_close w-full', {
-                                                    'bg-bank-gradient':
-                                                        isActive,
-                                                })}
+                                                className={cn(
+                                                    'mobilenav-sheet_close w-full',
+                                                    {
+                                                        'bg-bank-gradient':
+                                                            isActive,
+                                                    }
+                                                )}
                                                 href={link.route}
                                                 key={link.label}>
-                                                    <Image
-                                                        src={link.imgURL}
-                                                        alt={link.label}
-                                                        width={20}
-                                                        height={20}
-                                                        className={cn({
-                                                            'brightness-[3] invert-0':
-                                                                isActive,
-                                                        })}
-                                                    />
+                                                <Image
+                                                    src={link.imgURL}
+                                                    alt={link.label}
+                                                    width={20}
+                                                    height={20}
+                                                    className={cn({
+                                                        'brightness-[3] invert-0':
+                                                            isActive,
+                                                    })}
+                                                />
                                                 <p
                                                     className={cn(
                                                         'text-16 font-semibold text-black-2',
