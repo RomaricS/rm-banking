@@ -1,6 +1,6 @@
 'use server';
 
-import { ID } from 'node-appwrite';
+import { ID, Query } from 'node-appwrite';
 import { createAdminClient, createSessionClient } from '../server/appwrite';
 import { encryptId, extractCustomerIdFromUrl, parseStringify } from '../utils';
 import { cookies } from 'next/headers';
@@ -236,5 +236,43 @@ export const exchangePublicToken = async ({
             'An error occurred while creating exchanging token:',
             error
         );
+    }
+};
+
+// get user bank accounts
+export const getBanks = async ({ userId }: getBanksProps) => {
+    try {
+        const { database } = await createAdminClient();
+
+        const banks = await database.listDocuments(
+            DATABASE_ID!,
+            BANK_COLLECTION_ID!,
+            [Query.equal('userId', [userId])]
+        );
+
+        return parseStringify(banks.documents);
+    } catch (error) {
+        console.error('Error', error);
+        return null;
+    }
+};
+
+// get specific bank from bank collection by document id
+export const getBank = async ({ documentId }: getBankProps) => {
+    try {
+        const { database } = await createAdminClient();
+
+        const bank = await database.listDocuments(
+            DATABASE_ID!,
+            BANK_COLLECTION_ID!,
+            [Query.equal('$id', [documentId])]
+        );
+
+        if (bank.total !== 1) return null;
+
+        return parseStringify(bank.documents[0]);
+    } catch (error) {
+        console.error('Error', error);
+        return null;
     }
 };
