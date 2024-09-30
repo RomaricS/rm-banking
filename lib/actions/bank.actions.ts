@@ -9,18 +9,16 @@ import {
     TransferType,
 } from 'plaid';
 
-import { plaidClient } from '../plaid.config';
 import { parseStringify } from '../utils';
-
-import { getTransactionsByBankId } from './transaction.actions';
 import { getBanks, getBank } from './user.actions';
+import { plaidClient } from '@/lib/plaid';
+import { getTransactionsByBankId } from './transactions.actions';
 
 // Get multiple bank accounts
 export const getAccounts = async ({ userId }: getAccountsProps) => {
     try {
         // get banks from db
         const banks = await getBanks({ userId });
-
         const accounts = await Promise.all(
             banks?.map(async (bank: Bank) => {
                 // get each account info from plaid
@@ -45,7 +43,7 @@ export const getAccounts = async ({ userId }: getAccountsProps) => {
                     type: accountData.type as string,
                     subtype: accountData.subtype! as string,
                     appwriteItemId: bank.$id,
-                    shareableId: bank.sharableId,
+                    shareableId: bank.shareableId,
                 };
 
                 return account;
@@ -72,7 +70,7 @@ export const getAccount = async ({ appwriteItemId }: getAccountProps) => {
     try {
         // get bank from db
         const bank = await getBank({ documentId: appwriteItemId });
-
+        console.log('bank => ', bank)
         // get account info from plaid
         const accountsResponse = await plaidClient.accountsGet({
             access_token: bank.accessToken,
@@ -87,8 +85,8 @@ export const getAccount = async ({ appwriteItemId }: getAccountProps) => {
         const transferTransactions = transferTransactionsData.documents.map(
             (transferData: Transaction) => ({
                 id: transferData.$id,
-                name: transferData.name!,
-                amount: transferData.amount!,
+                name: transferData.name,
+                amount: transferData.amount,
                 date: transferData.$createdAt,
                 paymentChannel: transferData.channel,
                 category: transferData.category,
