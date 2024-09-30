@@ -45,7 +45,7 @@ const PlaidLink = ({ user, variant }: PlaidLinkProps) => {
             onClick={() => open()}
             disabled={!ready}
             className={`plaidlink-${variant ?? 'default'}`}>
-            {variant === 'ghost' && (
+            {variant !== 'primary' && (
                 <Image
                     src='/icons/connect-bank.svg'
                     alt='connect bank'
@@ -53,12 +53,15 @@ const PlaidLink = ({ user, variant }: PlaidLinkProps) => {
                     height={24}
                 />
             )}
-            <p
-                className={`text-[16px] font-semibold text-black-2 ${
-                    variant === 'ghost' ? 'hiddenl xl:block' : ''
-                }`}>
-                Connect bank
-            </p>
+
+            {variant !== 'primary' && (
+                <p
+                    className={`text-[16px] font-semibold text-black-2 ${
+                        variant === 'ghost' ? 'hiddenl xl:block' : ''
+                    }`}>
+                    Connect bank
+                </p>
+            )}
         </Button>
     );
 };
