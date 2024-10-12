@@ -7,7 +7,6 @@ import React from 'react';
 const bankCard = ({
     userName,
     account,
-    showBalance = true,
 }: CreditCardProps) => {
     return (
         <div className='flex flex-col'>

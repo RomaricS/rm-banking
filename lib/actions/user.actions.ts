@@ -130,6 +130,7 @@ export async function getLoggedInUser() {
 
         return parseStringify(user);
     } catch (error) {
+        console.error(error);
         return null;
     }
 }
@@ -140,6 +141,7 @@ export const logoutAccount = async () => {
         cookies().delete('appwrite-session');
         await account.deleteSession('current');
     } catch (error) {
+        console.error(error);
         return null;
     }
 };

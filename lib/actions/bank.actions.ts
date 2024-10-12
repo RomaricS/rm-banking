@@ -154,7 +154,7 @@ export const getTransactions = async ({
     accessToken,
 }: getTransactionsProps) => {
     let hasMore = true;
-    let transactions: any = [];
+    let transactions: Partial<Transaction[]> = [];
 
     try {
         // Iterate through each page of new transaction updates for item
@@ -165,7 +165,7 @@ export const getTransactions = async ({
 
             const data = response.data;
 
-            transactions = response.data.added.map((transaction) => ({
+            transactions = <Partial<Transaction[]>>response.data.added.map((transaction) => ({
                 id: transaction.transaction_id,
                 name: transaction.name,
                 paymentChannel: transaction.payment_channel,

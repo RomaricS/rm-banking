@@ -9,7 +9,7 @@ import { formUrlQuery } from '@/lib/utils';
 const Pagination = ({ page, totalPages }: PaginationProps) => {
     const router = useRouter();
 
-    const handleNavigation = (type: 'prev' | 'next') => {
+    const HandleNavigation = (type: 'prev' | 'next') => {
         const pageNumber = type === 'prev' ? page - 1 : page + 1;
 
         const newUrl = formUrlQuery({
@@ -27,7 +27,7 @@ const Pagination = ({ page, totalPages }: PaginationProps) => {
                 size='lg'
                 variant='ghost'
                 className='p-0 hover:bg-transparent'
-                onClick={() => handleNavigation('prev')}
+                onClick={() => HandleNavigation('prev')}
                 disabled={Number(page) <= 1}>
                 <Image
                     src='/icons/arrow-left.svg'
@@ -45,7 +45,7 @@ const Pagination = ({ page, totalPages }: PaginationProps) => {
                 size='lg'
                 variant='ghost'
                 className='p-0 hover:bg-transparent'
-                onClick={() => handleNavigation('next')}
+                onClick={() => HandleNavigation('next')}
                 disabled={Number(page) >= totalPages}>
                 Next
                 <Image
