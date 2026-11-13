@@ -13,7 +13,7 @@ enum DemoData {
         var items: [BankItem]
         var accounts: [Account]
         var pockets: [Pocket]
-        var categories: [Category]
+        var categories: [TxCategory]
         var transactions: [Transaction]
         var recurring: [RecurringStream]
         var budgets: [Budget]
@@ -48,8 +48,8 @@ enum DemoData {
         let other = pocket("other", "Other", "ellipsis", "#8B8B96", 6)
         let income = pocket("income", "Income", "arrow.down.left", "#3DDC97", 7, income: true)
 
-        func cat(_ p: Pocket, _ key: String, _ name: String, _ icon: String, _ sort: Int) -> Category {
-            Category(id: UUID(), pocketId: p.id, key: key, name: name, icon: icon, sort: sort)
+        func cat(_ p: Pocket, _ key: String, _ name: String, _ icon: String, _ sort: Int) -> TxCategory {
+            TxCategory(id: UUID(), pocketId: p.id, key: key, name: name, icon: icon, sort: sort)
         }
         let rent = cat(home, "rent", "Rent", "key.fill", 1)
         let utilities = cat(home, "utilities", "Utilities", "bolt.fill", 2)
@@ -69,7 +69,7 @@ enum DemoData {
 
         var rng = SeededRandom(seed: 42)
         var txs: [Transaction] = []
-        func add(_ amount: Decimal, _ name: String, _ c: Category?, _ d: Day, _ a: Account, method: PaymentMethod = .debitCard, kind: TxKind = .spend, review: Bool = false, pending: Bool = false, currency: String? = nil) {
+        func add(_ amount: Decimal, _ name: String, _ c: TxCategory?, _ d: Day, _ a: Account, method: PaymentMethod = .debitCard, kind: TxKind = .spend, review: Bool = false, pending: Bool = false, currency: String? = nil) {
             txs.append(Transaction(accountId: a.id, pending: pending, amount: amount, currency: currency ?? a.currency, date: d, rawName: name.uppercased(), merchantName: name, paymentMethod: method, kind: kind, categoryId: c?.id, categorySource: .plaid, needsReview: review))
         }
 

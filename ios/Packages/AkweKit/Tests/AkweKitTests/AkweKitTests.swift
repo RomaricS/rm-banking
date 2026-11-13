@@ -82,10 +82,10 @@ enum Fixture {
     static let home = Pocket(id: UUID(), key: "home", name: "Home", color: "#7C9CFF", sort: 1)
     static let food = Pocket(id: UUID(), key: "food", name: "Food", color: "#FF9F5A", sort: 2)
     static let income = Pocket(id: UUID(), key: "income", name: "Income", isIncome: true, sort: 9)
-    static let groceries = Category(id: UUID(), pocketId: food.id, key: "groceries", name: "Groceries")
-    static let coffee = Category(id: UUID(), pocketId: food.id, key: "coffee", name: "Coffee")
-    static let utilities = Category(id: UUID(), pocketId: home.id, key: "utilities", name: "Utilities")
-    static let paycheck = Category(id: UUID(), pocketId: income.id, key: "paycheck", name: "Paycheck")
+    static let groceries = TxCategory(id: UUID(), pocketId: food.id, key: "groceries", name: "Groceries")
+    static let coffee = TxCategory(id: UUID(), pocketId: food.id, key: "coffee", name: "Coffee")
+    static let utilities = TxCategory(id: UUID(), pocketId: home.id, key: "utilities", name: "Utilities")
+    static let paycheck = TxCategory(id: UUID(), pocketId: income.id, key: "paycheck", name: "Paycheck")
     static let checking = Account(id: UUID(), itemId: UUID(), name: "Checking", type: "depository", subtype: "checking", currency: "USD", currentBalance: 4212.18)
     static let savings = Account(id: UUID(), itemId: UUID(), name: "Savings", type: "depository", subtype: "savings", currency: "USD", currentBalance: 6950)
     static let card = Account(id: UUID(), itemId: UUID(), name: "Card", type: "credit", currency: "USD", currentBalance: -842.40)
@@ -93,7 +93,7 @@ enum Fixture {
     static let schedule = PaySchedule(frequency: .biweekly, anchorDate: Day(2026, 11, 7), typicalAmount: 3250)
     static let today = Day(2026, 11, 13)
 
-    static func tx(_ amount: Decimal, _ cat: Category?, _ date: Day, kind: TxKind = .spend, account: Account = checking, name: String = "Shop", currency: String = "USD") -> Transaction {
+    static func tx(_ amount: Decimal, _ cat: TxCategory?, _ date: Day, kind: TxKind = .spend, account: Account = checking, name: String = "Shop", currency: String = "USD") -> Transaction {
         Transaction(accountId: account.id, amount: amount, currency: currency, date: date, rawName: name, kind: kind, categoryId: cat?.id)
     }
 

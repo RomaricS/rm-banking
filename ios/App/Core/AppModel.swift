@@ -31,7 +31,7 @@ final class AppModel {
     var items: [BankItem] = []
     var accounts: [Account] = []
     var pockets: [Pocket] = []
-    var categories: [Category] = []
+    var categories: [TxCategory] = []
     var transactions: [Transaction] = []
     var rules: [Rule] = []
     var budgets: [Budget] = []
@@ -83,7 +83,7 @@ final class AppModel {
     func item(for account: Account) -> BankItem? { items.first { $0.id == account.itemId } }
     func accountColor(_ a: Account) -> Color { Color(hexString: a.color ?? (a.isCredit ? "#FFB86B" : "#A99FFF")) }
     var itemsNeedingAttention: [BankItem] { items.filter { $0.status.needsAttention } }
-    var spendingCategories: [Category] {
+    var spendingCategories: [TxCategory] {
         let incomePockets = Set(pockets.filter(\.isIncome).map(\.id))
         return categories.filter { !$0.archived && !incomePockets.contains($0.pocketId) }
     }
@@ -150,7 +150,7 @@ final class AppModel {
             async let it: [BankItem] = backend.fetch("bank_items", order: "created_at")
             async let ac: [Account] = backend.fetch("accounts", order: "sort")
             async let po: [Pocket] = backend.fetch("pockets", order: "sort")
-            async let ca: [Category] = backend.fetch("categories", order: "sort")
+            async let ca: [TxCategory] = backend.fetch("categories", order: "sort")
             async let tx = backend.transactions(since: since)
             async let ru: [Rule] = backend.fetch("rules")
             async let bu: [Budget] = backend.fetch("budgets")
@@ -358,7 +358,7 @@ final class AppModel {
 
     // MARK: Pockets & categories
 
-    func moveCategory(_ category: Category, to pocket: Pocket) async {
+    func moveCategory(_ category: TxCategory, to pocket: Pocket) async {
         guard let i = categories.firstIndex(where: { $0.id == category.id }) else { return }
         categories[i].pocketId = pocket.id
         Haptics.success()
@@ -373,7 +373,7 @@ final class AppModel {
         do { try await backend.upsert("pockets", P(id: pocket.id, userId: uid, name: pocket.name, icon: pocket.icon, color: pocket.color, sort: pocket.sort)) } catch { show(error) }
     }
 
-    func saveCategory(_ category: Category) async {
+    func saveCategory(_ category: TxCategory) async {
         if let i = categories.firstIndex(where: { $0.id == category.id }) { categories[i] = category } else { categories.append(category) }
         guard let backend, let uid = userId else { return }
         struct C: Encodable { let id: UUID; let userId: UUID; let pocketId: UUID; let name: String; let icon: String; let sort: Int; let archived: Bool }
@@ -551,7 +551,7 @@ final class AppModel {
 
     private struct Cache: Codable {
         var profile: Profile?; var schedule: PaySchedule; var items: [BankItem]; var accounts: [Account]; var pockets: [Pocket]
-        var categories: [Category]; var transactions: [Transaction]; var budgets: [Budget]; var recurring: [RecurringStream]
+        var categories: [TxCategory]; var transactions: [Transaction]; var budgets: [Budget]; var recurring: [RecurringStream]
         var goals: [Goal]; var members: [GoalMember]
     }
 

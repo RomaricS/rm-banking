@@ -143,7 +143,7 @@ public struct Pocket: Codable, Hashable, Identifiable, Sendable {
     }
 }
 
-public struct Category: Codable, Hashable, Identifiable, Sendable {
+public struct TxCategory: Codable, Hashable, Identifiable, Sendable {
     public var id: UUID
     public var pocketId: UUID
     public var key: String?

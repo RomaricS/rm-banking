@@ -14,7 +14,7 @@ public struct PocketTotal: Hashable, Identifiable, Sendable {
 
 public struct CategoryTotal: Hashable, Identifiable, Sendable {
     public var id: UUID { category.id }
-    public let category: Category
+    public let category: TxCategory
     public let amount: Decimal
     public let count: Int
 }
