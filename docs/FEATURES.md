@@ -1,8 +1,8 @@
-# Feature Spec — iOS Expense Tracker (Plaid)
+# akwe — Feature Spec (iOS, Plaid)
 
 > Status: **Draft for review.** No code yet. Once the feature list is locked, the next pass covers flows, screen design, motion and the design system.
 
-Working name: **TBD** (placeholder: "Ledger").
+App name: **akwe** (*akwɛ* = money in Fongbe). Logo: a cowrie shell, historically used as money in Dahomey, on an indigo app icon with a mint coin.
 
 ## 1. Vision
 
@@ -187,6 +187,8 @@ Rules that keep it simple:
 | X2 | Face ID lock on open + privacy blur in app switcher | P0 |
 | X3 | Hide balances toggle (tap/shake to reveal) — Revolut-style | P1 |
 | X4 | **Display currency setting** (USD / CAD / EUR / GBP / CHF, more later): every amount, chart, budget and goal converts. Balances at today's rate; past transactions at their own date's rate; original amount shown under foreign transactions | **P0** |
+| X7 | **Light & dark mode**, following iOS by default, overridable in Settings (System / Light / Dark) | **P0** |
+| X8 | **French + English** at launch (String Catalog), locale-aware numbers, dates and currency (`12 480,32 €`, `13 nov.`); app language independent from display currency | **P0** |
 | X5 | CSV export | P2 |
 | X6 | Delete account & all data, unlink banks | P0 |
 
