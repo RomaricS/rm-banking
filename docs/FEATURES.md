@@ -54,6 +54,11 @@ Priority legend: **P0** = MVP, **P1** = shortly after, **P2** = later / nice to 
 | T8 | Exclude a transaction from stats (reimbursed, one-off) | P0 |
 | T9 | Attach a receipt photo | P2 |
 | T10 | Mark as reimbursable / "owed to me" and track until repaid | P2 |
+| T11 | **Payment method tag** on every transaction: Debit card · Credit card · Deferred card · Direct debit · Transfer · ATM · Check | P0 |
+| T12 | US/Canada: method from Plaid account type/subtype (checking vs credit card) + payment channel | P0 |
+| T13 | France/EU: method parsed from bank labels (`CB`/`CARTE` = card, `PRLV` = direct debit, `VIR` = transfer, `RETRAIT DAB` = ATM, `CHQ` = check), user can correct per account | P0 |
+| T14 | **Deferred-debit cards (carte à débit différé)**: purchases count on purchase day; the month-end lump (`FACTURE CARTE`…) is matched to the cycle and tagged *Card settlement* (excluded, like a credit-card payment). Card screen shows "€560 this cycle, debited Nov 30" | P0 |
+| T15 | Accounts & cards screen: each card with its type, credit utilization / due date, deferred cycle total | P1 |
 
 ### 3.3 Categorization
 
@@ -135,6 +140,8 @@ Rules that keep it simple:
 | G6 | **Plan / forecast**: project end-of-period balance from recurring bills + average spend | P1 |
 | G7 | "What if" planner: "If I cut Restaurants by 30%, goal X arrives 2 months earlier" | P2 |
 | G8 | Debt payoff goals (credit card / loan balance trending to 0) | P2 |
+| G10 | **Shared goals**: invite a partner (iMessage link, they sign in with Apple). Each person counts their own money (earmark / account / manual log); no money moves. Two-color ring, per-person share, activity feed, "cheer" nudge | P1 |
+| G11 | Shared-goal privacy: partner always sees goal progress; optionally your amount (else only your %); never your transactions or balances. Leaving splits it back into personal goals | P1 |
 
 ### 3.8 Recurring & subscriptions
 
@@ -163,7 +170,7 @@ Rules that keep it simple:
 | X1 | **Sign in with Apple — the only login method** (no email/password, no Google) | P0 |
 | X2 | Face ID lock on open + privacy blur in app switcher | P0 |
 | X3 | Hide balances toggle (tap/shake to reveal) — Revolut-style | P1 |
-| X4 | Multi-currency display (if any bank is non-USD) | P2 |
+| X4 | **Display currency setting** (USD / CAD / EUR, extensible): every amount, chart, budget and goal converts. Balances at today's rate; past transactions at their own date's rate; original amount shown under foreign transactions | **P0** |
 | X5 | CSV export | P2 |
 | X6 | Delete account & all data, unlink banks | P0 |
 
@@ -197,7 +204,7 @@ Design canvas (flows, screens, motion): https://claude.ai/artifact/H2gQvgcEXUZLp
 3. **Pay schedule** — what's your pay frequency? Do you have multiple income sources?
 4. **Budgets** — do you want spending limits in MVP, or just stats first?
 5. **Single user only**, or should a partner be able to share the view later?
-6. **Currencies** — are all 3 banks USD / same country?
+6. **Currencies** — which countries are your banks in (US / Canada / France)? Is the French bank supported by Plaid (Plaid's EU coverage includes France, but check your specific bank)?
 7. **Plaid account** — do you already have Plaid API keys (Sandbox / Production)?
 8. Anything in P1/P2 you want promoted to MVP — or cut?
 
