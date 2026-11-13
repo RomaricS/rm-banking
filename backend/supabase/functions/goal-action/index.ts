@@ -51,11 +51,13 @@ serve(async (req, body) => {
       if (!inv || inv.accepted_at || Date.parse(inv.expires_at) < Date.now()) throw new HttpError(410, "invite expired");
       if (inv.created_by === userId) throw new HttpError(400, "cannot join your own goal");
       const funding = (body.funding as string) ?? "manual";
-      await admin.from("goal_members").upsert({
+      const { error: joinError } = await admin.from("goal_members").upsert({
         goal_id: inv.goal_id, user_id: userId, role: "partner", display_name: await displayName(userId), funding,
         account_id: funding === "account" ? body.accountId : null,
         earmark_amount: funding === "earmark" ? body.earmarkAmount : null,
       });
+      // e.g. the goal_members_own_account check rejects an account that isn't the caller's
+      if (joinError) throw new HttpError(400, "could not join this goal");
       await admin.from("goal_invites").update({ accepted_by: userId, accepted_at: new Date().toISOString() }).eq("code", inv.code);
       await admin.from("goal_events").insert({ goal_id: inv.goal_id, user_id: userId, kind: "joined" });
       const { data: goal } = await admin.from("goals").select("name").eq("id", inv.goal_id).single();

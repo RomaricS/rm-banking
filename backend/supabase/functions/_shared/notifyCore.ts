@@ -119,7 +119,9 @@ export async function refreshGoals(admin: Admin, userId: string, rates?: RateTab
     const cur = (m as any).goals.currency as string;
     let amount: number | null = null;
     if (m.funding === "account" && m.account_id) {
-      const { data: acc } = await admin.from("accounts").select("current_balance, currency").eq("id", m.account_id).single();
+      // Only the member's own account counts, even if account_id was pointed elsewhere.
+      const { data: acc } = await admin.from("accounts").select("current_balance, currency")
+        .eq("id", m.account_id).eq("user_id", m.user_id).maybeSingle();
       if (acc?.current_balance != null) amount = Math.max(0, safeConvert(Number(acc.current_balance), acc.currency, cur, rates));
     } else if (m.funding === "earmark") {
       amount = Number(m.earmark_amount ?? 0);

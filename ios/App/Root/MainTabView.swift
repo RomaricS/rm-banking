@@ -17,7 +17,13 @@ enum AppTab: String, CaseIterable, Identifiable {
 
 struct MainTabView: View {
     @Environment(AppModel.self) private var app
-    @State private var tab: AppTab = .home
+    @State private var tab: AppTab = {
+        #if DEBUG
+        // Screenshots / UI checks: launch with `-AkweTab insights` to open on a given tab.
+        if let raw = UserDefaults.standard.string(forKey: "AkweTab"), let t = AppTab(rawValue: raw) { return t }
+        #endif
+        return .home
+    }()
     @State private var homePath = NavigationPath()
     @State private var activityPath = NavigationPath()
     @State private var insightsPath = NavigationPath()
@@ -34,14 +40,19 @@ struct MainTabView: View {
                 }
             }
             .transition(.opacity)
-            // Content fades out under the floating tab bar.
-            LinearGradient(stops: [.init(color: Palette.ground.opacity(0), location: 0),
-                                   .init(color: Palette.ground.opacity(0.72), location: 0.38),
-                                   .init(color: Palette.ground, location: 0.72)],
-                           startPoint: .top, endPoint: .bottom)
-                .frame(height: 150)
-                .ignoresSafeArea(edges: .bottom)
-                .allowsHitTesting(false)
+            // Content fades out under the floating tab bar. Pinned in a VStack so the gradient itself
+            // reaches the screen's bottom edge (a framed gradient stopped at the safe area).
+            VStack(spacing: 0) {
+                Spacer(minLength: 0)
+                LinearGradient(stops: [.init(color: Palette.ground.opacity(0), location: 0),
+                                       .init(color: Palette.ground.opacity(0.6), location: 0.45),
+                                       .init(color: Palette.ground, location: 0.85)],
+                               startPoint: .top, endPoint: .bottom)
+                    .frame(height: 150)
+            }
+            .ignoresSafeArea(edges: .bottom)
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
             FloatingTabBar(selection: $tab)
                 .padding(.horizontal, 16)
                 .padding(.bottom, 4)
