@@ -39,6 +39,7 @@ Deno.test("merchant normalization", () => {
   assertEquals(merchantKey("SQ *BLUE BOTTLE COFFEE 0423"), "blue bottle coffee");
   assertEquals(merchantKey("PRLV SEPA EDF"), "edf");
   assertEquals(merchantKey("Uber"), merchantKey("UBER"));
+  assertEquals(merchantKey("Café Pouchkine"), "cafe pouchkine");
   assertEquals(displayName("ACHAT CB MONOPRIX 12/11"), "Monoprix");
 });
 

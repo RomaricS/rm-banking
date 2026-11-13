@@ -9,6 +9,7 @@
 |---|---|---|
 | iOS | Swift 6 / SwiftUI, iOS 17+, `@Observable` | Native motion, widgets, Sign in with Apple, LinkKit |
 | Project file | **XcodeGen** (`ios/project.yml`) → run `xcodegen` on the Mac | No .xcodeproj merge pain; generated from text |
+| Swift mode | Swift 6 compiler in **Swift 5 language mode** for app targets (avoids strict-concurrency churn); AkweKit types are `Sendable` | Fewer surprises on first build |
 | Domain logic | Local Swift package **`ios/Packages/AkweKit`** (Foundation only) | Unit-testable on Linux CI and macOS; app + widget share it |
 | Local cache | Codable JSON snapshot in the App Group container | Simple, shared with widgets; server is source of truth |
 | Backend | **Supabase** (Postgres + RLS, Auth, Edge Functions in Deno/TS, pg_cron) | Auth with Apple, secrets server-side, cheap |
@@ -30,7 +31,7 @@ Design reference: https://claude.ai/artifact/H2gQvgcEXUZLpBW9YVKo94 · Feature s
 - [x] **1. Database** — migrations: schema, RLS, default categories/pockets, triggers, cron
 - [x] **2. Backend shared logic + tests** — payment method parser (US/CA/FR/UK/DE), transfer pairing, card settlement, category mapping, rules, pay periods, FX
 - [x] **3. Edge functions** — plaid-link-token, plaid-exchange, plaid-sync, plaid-webhook, fx-refresh, notify, goal-invite / goal-join, delete-account
-- [ ] **4. AkweKit** — models, Money/FX, pay period engine, stats, budgets, goals projection, safe-to-spend, formatting + tests
+- [x] **4. AkweKit** — models, Money/FX, pay period engine, stats, budgets, goals projection, safe-to-spend, formatting + tests
 - [ ] **5. App shell** — project.yml, theme, components, localization, AppModel, Supabase client, Sign in with Apple, Face ID lock, tab bar
 - [ ] **6. Onboarding** — welcome, link banks (LinkKit), first sync, pay schedule
 - [ ] **7. Home & Activity** — home, activity feed + filters/search, transaction detail, review inbox, rules
@@ -47,3 +48,4 @@ Design reference: https://claude.ai/artifact/H2gQvgcEXUZLpBW9YVKo94 · Feature s
 - 2026-11-13 · 1 · 4 migrations (schema, RLS, defaults trigger, cron). Validated on Postgres 16 with Supabase stubs: defaults seeded (7 pockets / 30 categories), cross-user isolation, shared-goal privacy view, server-only columns protected
 - 2026-11-13 · 2 · `_shared/` normalize, paymentMethod, categorize, kinds (transfers/card payments/deferred settlement), payPeriod, fx — `deno test tests/` 9/9 green
 - 2026-11-13 · 3 · Edge functions: plaid-link-token (incl. update mode, 4-bank cap, OAuth redirect), plaid-exchange (dedupe same bank, first sync), plaid-sync (user or cron-all), plaid-webhook (ES256 JWT verification, item errors → re-auth push), plaid-remove-item, fx-refresh (frankfurter, 2y backfill, XOF peg), notify (daily + evaluate), goal-action (invite/preview/join/cheer/check/leave), delete-account. `_shared/syncCore.ts` (cursor sync, pending→posted carry-over of user edits, transfer pairing, recurring streams, pay-schedule auto-detect), `_shared/notifyCore.ts` (budgets 80/100 %, goal milestones/reached, bills due, payday summary, en/fr strings, dedupe via notification_log), `_shared/apns.ts`. Migration 5: goal triggers. `deno check` clean, tests 9/9, migrations re-validated
+- 2026-11-13 · 4 · AkweKit: Day/DayRange, Models (fallback enums), PaySchedule periods + detection (mirrors TS), RateBook FX + MoneyFormat, MerchantNormalizer (byte-for-byte same keys as server), Ledger, Stats (summary, pockets w/ previous, cumulative + average curve, history, weekday pattern), Planning (budget status, safe-to-spend, goal progress/status, what-if arrival), WidgetSnapshot + AppGroup. `swift test` 16/16 on Linux (Swift 6.0.3)
