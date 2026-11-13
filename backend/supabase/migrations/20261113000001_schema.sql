@@ -5,7 +5,7 @@
 --     (Plaid uses the opposite sign; the sync function flips it)
 --   * every user-owned row carries user_id and is protected by RLS (see 0002)
 
-create extension if not exists pgcrypto;
+create extension if not exists pgcrypto with schema extensions;
 
 create schema if not exists private;
 revoke all on schema private from anon, authenticated;
@@ -283,7 +283,7 @@ create table public.goal_events (
 create index on public.goal_events (goal_id, created_at desc);
 
 create table public.goal_invites (
-  code text primary key default encode(gen_random_bytes(9), 'base64'),
+  code text primary key default translate(encode(extensions.gen_random_bytes(9), 'base64'), '+/', '-_'),
   goal_id uuid not null references public.goals (id) on delete cascade,
   created_by uuid not null references auth.users (id) on delete cascade,
   share_amount_visible boolean not null default true,

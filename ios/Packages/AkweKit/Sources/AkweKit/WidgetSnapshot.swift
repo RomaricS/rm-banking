@@ -51,7 +51,7 @@ public extension Ledger {
 }
 
 public enum AppGroup {
-    public static let identifier = "group.com.akwe.app"
+    public static let identifier = "group.com.wakalo.akwe"
     public static var containerURL: URL? {
         #if canImport(Darwin)
         FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: identifier)

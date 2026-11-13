@@ -7,33 +7,41 @@ final class PlaidLinker {
     struct Result { let publicToken: String; let institutionId: String?; let institutionName: String? }
 
     private var handler: Handler?
+    private var continuation: CheckedContinuation<Result?, Never>?
 
     func open(token: String) async -> Result? {
-        await withCheckedContinuation { (cont: CheckedContinuation<Result?, Never>) in
-            var finished = false
-            func finish(_ r: Result?) {
-                guard !finished else { return }
-                finished = true
-                self.handler = nil
-                cont.resume(returning: r)
-            }
-            var config = LinkTokenConfiguration(token: token) { success in
-                finish(Result(publicToken: success.publicToken,
-                              institutionId: success.metadata.institution.id,
-                              institutionName: success.metadata.institution.name))
-            }
-            config.onExit = { _ in finish(nil) }
-
-            switch Plaid.create(config) {
-            case .failure(let error):
-                print("Plaid create failed:", error)
-                finish(nil)
-            case .success(let handler):
-                self.handler = handler
-                guard let vc = Self.topViewController() else { finish(nil); return }
-                handler.open(presentUsing: .viewController(vc))
-            }
+        finish(nil) // resolve any Link session that is still pending
+        return await withCheckedContinuation { (cont: CheckedContinuation<Result?, Never>) in
+            // The body runs synchronously on the caller's executor (the main actor), so this is safe.
+            MainActor.assumeIsolated { self.start(token: token, continuation: cont) }
         }
+    }
+
+    private func start(token: String, continuation cont: CheckedContinuation<Result?, Never>) {
+        continuation = cont
+        var config = LinkTokenConfiguration(token: token) { [weak self] success in
+            self?.finish(Result(publicToken: success.publicToken,
+                                institutionId: success.metadata.institution.id,
+                                institutionName: success.metadata.institution.name))
+        }
+        config.onExit = { [weak self] _ in self?.finish(nil) }
+
+        switch Plaid.create(config) {
+        case .failure(let error):
+            print("Plaid create failed:", error)
+            finish(nil)
+        case .success(let handler):
+            self.handler = handler
+            guard let vc = Self.topViewController() else { finish(nil); return }
+            handler.open(presentUsing: .viewController(vc))
+        }
+    }
+
+    private func finish(_ result: Result?) {
+        guard let cont = continuation else { return }
+        continuation = nil
+        handler = nil
+        cont.resume(returning: result)
     }
 
     static func topViewController() -> UIViewController? {

@@ -36,6 +36,8 @@ struct LinkBanksView: View {
     var onContinue: (() -> Void)?
     @State private var linker = PlaidLinker()
     @State private var opening = false
+    /// Set while a bank Plaid just returned is being saved; drives the full-screen progress.
+    @State private var adding: (name: String, stage: LinkStage)?
 
     private let maxBanks = 4
 
@@ -57,11 +59,15 @@ struct LinkBanksView: View {
                 if app.items.count < maxBanks {
                     Button { Task { await addBank() } } label: {
                         HStack(spacing: 12) {
-                            Image(systemName: opening ? "hourglass" : "plus").font(.system(size: 20, weight: .bold))
+                            ZStack {
+                                if opening { ProgressView().tint(Palette.iris) }
+                                else { Image(systemName: "plus").font(.system(size: 20, weight: .bold)) }
+                            }
                                 .foregroundStyle(Palette.iris).frame(width: 44, height: 44)
                                 .background(Palette.iris.opacity(0.16), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
                             VStack(alignment: .leading, spacing: 2) {
-                                Text(app.items.isEmpty ? tr("link.addFirst") : tr("link.addAnother")).font(.system(size: 16, weight: .semibold))
+                                Text(opening ? tr("link.opening") : app.items.isEmpty ? tr("link.addFirst") : tr("link.addAnother"))
+                                    .font(.system(size: 16, weight: .semibold))
                                 Text(tr("link.slotsLeft", maxBanks - app.items.count)).font(.system(size: 13)).foregroundStyle(Palette.text2)
                             }
                             Spacer()
@@ -91,6 +97,17 @@ struct LinkBanksView: View {
             }
         }
         .animation(Motion.bouncy, value: app.items.count)
+        .overlay {
+            if let adding {
+                AddingBankView(bankName: adding.name, stage: adding.stage)
+                    .transition(.opacity)
+            }
+        }
+        .animation(Motion.smooth, value: adding?.stage)
+        .animation(Motion.smooth, value: adding == nil)
+        .interactiveDismissDisabled(adding != nil)
+        .navigationBarBackButtonHidden(adding != nil)
+        .toolbar(adding != nil ? .hidden : .automatic, for: .navigationBar)
     }
 
     private func addBank() async {
@@ -98,10 +115,17 @@ struct LinkBanksView: View {
         defer { opening = false }
         do {
             let token = try await app.linkToken()
-            if let r = await linker.open(token: token) {
-                await app.exchange(publicToken: r.publicToken, institutionId: r.institutionId, institutionName: r.institutionName)
+            guard let r = await linker.open(token: token) else { return }
+            let name = r.institutionName ?? tr("link.yourBank")
+            adding = (name, .importing)
+            let ok = await app.exchange(publicToken: r.publicToken, institutionId: r.institutionId, institutionName: r.institutionName) { stage in
+                adding = (name, stage)
             }
+            // Let the success state register before the new row drops into its slot.
+            if ok { try? await Task.sleep(for: .milliseconds(900)) }
+            adding = nil
         } catch {
+            adding = nil
             app.show(error)
         }
     }

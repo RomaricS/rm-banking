@@ -27,6 +27,28 @@ final class DayAndPeriodTests: XCTestCase {
         XCTAssertEqual(mo.period(containing: Day(2026, 2, 10)), DayRange(start: Day(2026, 1, 31), end: Day(2026, 2, 27)))
     }
 
+    /// The 6th & 21st: two fixed dates a month, which no "every 2 weeks" anchor can express.
+    func testTwiceAMonthOnSixthAndTwentyFirst() {
+        let s = PaySchedule(frequency: .semimonthly, anchorDate: Day(2026, 11, 6), semimonthlyDays: [6, 21])
+        XCTAssertEqual(s.nextPayday(after: Day(2026, 11, 13)), Day(2026, 11, 21))
+        XCTAssertEqual(s.nextPayday(after: Day(2026, 11, 21)), Day(2026, 12, 6))
+        XCTAssertEqual(s.nextPayday(after: Day(2026, 12, 6)), Day(2026, 12, 21))
+        XCTAssertEqual(s.period(containing: Day(2026, 11, 25)), DayRange(start: Day(2026, 11, 21), end: Day(2026, 12, 5)))
+        // Detection picks it up from history (gaps of 15–16 days, two clusters).
+        let detected = Periods.detectSchedule(paydays: ["2026-09-06", "2026-09-21", "2026-10-06", "2026-10-21", "2026-11-06"].map { Day($0)! })
+        XCTAssertEqual(detected?.frequency, .semimonthly)
+        XCTAssertEqual(detected?.semimonthlyDays, [6, 21])
+    }
+
+    /// Picking a next payday sets the anchor; later paydays follow the frequency.
+    func testNextPaydayAsAnchor() {
+        let bi = PaySchedule(frequency: .biweekly, anchorDate: Day(2026, 11, 20))
+        XCTAssertEqual(bi.nextPayday(after: Day(2026, 11, 13)), Day(2026, 11, 20))
+        XCTAssertEqual(bi.nextPayday(after: Day(2026, 11, 20)), Day(2026, 12, 4))
+        let mo = PaySchedule(frequency: .monthly, anchorDate: Day(2026, 11, 28))
+        XCTAssertEqual(mo.nextPayday(after: Day(2026, 11, 13)), Day(2026, 11, 28))
+    }
+
     func testCalendarPeriods() {
         XCTAssertEqual(Periods.month(containing: Day(2026, 2, 10)), DayRange(start: Day(2026, 2, 1), end: Day(2026, 2, 28)))
         XCTAssertEqual(Periods.week(containing: Day(2026, 11, 13)).start, Day(2026, 11, 9)) // Monday

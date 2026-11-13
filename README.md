@@ -36,7 +36,7 @@ open Akwe.xcodeproj
 
 Pick an iPhone simulator and run. With `SUPABASE_URL` empty the app starts in **demo mode**: no sign-in, generated sample data (three banks incl. a Canadian card and a La Banque Postale deferred-debit card, goals, a shared goal, bills). Everything is browsable; linking real banks is disabled.
 
-> First build: in **Signing & Capabilities**, select your team for both targets (`Akwe`, `AkweWidgets`). Xcode may ask to register the App Group `group.com.akwe.app`. If the bundle id `com.akwe.app` is taken, change it in `project.yml` (app, widget, App Group in both entitlements, and `AppGroup.identifier` in `AkweKit/WidgetSnapshot.swift`).
+> First build: in **Signing & Capabilities**, select your team for both targets (`Akwe`, `AkweWidgets`). Xcode may ask to register the App Group `group.com.wakalo.akwe`. If the bundle id `com.wakalo.akwe` is taken, change it in `project.yml` (app, widget, App Group in both entitlements, and `AppGroup.identifier` in `AkweKit/WidgetSnapshot.swift`).
 
 ## 2. Run the tests
 
@@ -69,7 +69,7 @@ In Xcode, ⌘U on the `Akwe` scheme runs the AkweKit tests. CI (`.github/workflo
    select vault.create_secret('https://YOUR-PROJECT-REF.supabase.co', 'project_url');
    select vault.create_secret('YOUR-SERVICE-ROLE-KEY', 'service_role_key');
    ```
-5. **Auth › Providers › Apple**: enable it and add your app's bundle id (`com.akwe.app`) to *Client IDs*. Native Sign in with Apple only needs the bundle id.
+5. **Auth › Providers › Apple**: enable it and add your app's bundle id (`com.wakalo.akwe`) to *Client IDs*. Native Sign in with Apple only needs the bundle id.
 6. Function secrets: copy `backend/supabase/functions/.env.example` to `.env`, fill it in, then:
    ```bash
    supabase secrets set --env-file ./supabase/functions/.env
@@ -88,14 +88,15 @@ In Xcode, ⌘U on the `Akwe` scheme runs the AkweKit tests. CI (`.github/workflo
 2. Dashboard › Developers › API › **Allowed redirect URIs**: add `https://YOUR-DOMAIN/plaid-oauth` and set `PLAID_REDIRECT_URI` to it. Most European banks (La Banque Postale, Revolut…) use OAuth and need this.
 3. Webhook URL is set automatically per link token (`…/functions/v1/plaid-webhook`).
 4. Sandbox test login: `user_good` / `pass_good`. For production, request access for **Transactions** in the US, CA and EU (FR) and switch `PLAID_ENV=production`.
+5. No domain yet? Leave `PLAID_REDIRECT_URI` empty: Sandbox's non-OAuth test banks work without it. The full production switch (free GitHub Pages domain included) is in [docs/GO-LIVE.md](docs/GO-LIVE.md).
 
 ## 5. Apple
 
-- **Sign in with Apple**, **Push Notifications**, **App Groups** (`group.com.akwe.app`) and **Associated Domains** are declared in `project.yml`; Xcode's automatic signing creates them.
+- **Sign in with Apple**, **Push Notifications**, **App Groups** (`group.com.wakalo.akwe`) and **Associated Domains** are declared in `project.yml`; Xcode's automatic signing creates them.
 - **Push (APNs)**: Certificates, IDs & Profiles › Keys › create a key with *Apple Push Notifications service*. Put its Key ID, your Team ID and the `.p8` contents into `APNS_KEY_ID`, `APNS_TEAM_ID`, `APNS_PRIVATE_KEY` (newlines as `\n`). Debug builds register as `sandbox`, release builds as `production`.
 - **Universal links** (Plaid OAuth return + shared-goal invites): host `https://YOUR-DOMAIN/.well-known/apple-app-site-association`:
   ```json
-  { "applinks": { "details": [ { "appIDs": ["TEAMID.com.akwe.app"], "components": [ { "/": "/plaid-oauth*" }, { "/": "/join*" } ] } ] } }
+  { "applinks": { "details": [ { "appIDs": ["TEAMID.com.wakalo.akwe"], "components": [ { "/": "/plaid-oauth*" }, { "/": "/join*" } ] } ] } }
   ```
   Set `AKWE_LINK_DOMAIN` in `Secrets.xcconfig` and `INVITE_BASE_URL=https://YOUR-DOMAIN/join` in the function secrets. Without a domain, invites fall back to `akwe://join?code=…`.
 

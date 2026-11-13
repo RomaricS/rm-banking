@@ -212,19 +212,28 @@ final class AppModel {
         return r.linkToken
     }
 
-    func exchange(publicToken: String, institutionId: String?, institutionName: String?) async {
-        guard let backend else { return }
+    /// Saves a newly linked bank. The server imports accounts + history before replying, so this
+    /// reports each stage for the progress screen. Returns false if it failed (error already shown).
+    @discardableResult
+    func exchange(publicToken: String, institutionId: String?, institutionName: String?,
+                  progress: (LinkStage) -> Void = { _ in }) async -> Bool {
+        guard let backend else { return false }
         isSyncing = true
         defer { isSyncing = false }
         do {
             var inst: [String: AnyJSON] = [:]
             if let institutionId { inst["id"] = .string(institutionId) }
             if let institutionName { inst["name"] = .string(institutionName) }
+            progress(.importing)
             try await backend.invokeVoid("plaid-exchange", ["publicToken": .string(publicToken), "institution": .object(inst)])
+            progress(.finishing)
             await load()
+            progress(.done)
             Haptics.success()
+            return true
         } catch {
             show(error)
+            return false
         }
     }
 
