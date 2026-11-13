@@ -30,6 +30,46 @@ struct MainTabView: View {
     @State private var planPath = NavigationPath()
 
     var body: some View {
+        Group {
+            if #available(iOS 26.0, *) {
+                nativeTabs
+            } else {
+                legacyTabs
+            }
+        }
+        .ignoresSafeArea(.keyboard)
+        .task { await AppDelegate.requestPushPermission() }
+    }
+
+    /// iOS 26+: the system tab bar (Liquid Glass) — floating glass capsule, native selection morph,
+    /// shrinks while scrolling down, and its own edge blur under the content.
+    @available(iOS 26.0, *)
+    private var nativeTabs: some View {
+        TabView(selection: $tab) {
+            Tab(value: AppTab.home) {
+                NavigationStack(path: $homePath) { HomeView(tab: $tab).withDestinations() }
+            } label: { tabLabel(.home) }
+            Tab(value: AppTab.activity) {
+                NavigationStack(path: $activityPath) { ActivityView().withDestinations() }
+            } label: { tabLabel(.activity) }
+            Tab(value: AppTab.insights) {
+                NavigationStack(path: $insightsPath) { InsightsView().withDestinations() }
+            } label: { tabLabel(.insights) }
+            Tab(value: AppTab.plan) {
+                NavigationStack(path: $planPath) { PlanView().withDestinations() }
+            } label: { tabLabel(.plan) }
+        }
+        .tabBarMinimizeBehavior(.onScrollDown)
+        .tint(Palette.iris)
+        .onChange(of: tab) { _, _ in Haptics.selection() }
+    }
+
+    private func tabLabel(_ t: AppTab) -> some View {
+        Label { Text(t.title) } icon: { TabIcon.image(t) }
+    }
+
+    /// iOS 17–25: custom glass capsule from the design canvas.
+    private var legacyTabs: some View {
         ZStack(alignment: .bottom) {
             Group {
                 switch tab {
@@ -57,8 +97,6 @@ struct MainTabView: View {
                 .padding(.horizontal, 16)
                 .padding(.bottom, 4)
         }
-        .ignoresSafeArea(.keyboard)
-        .task { await AppDelegate.requestPushPermission() }
     }
 }
 
@@ -112,6 +150,29 @@ struct FloatingTabBar: View {
 /// Home and Plan use SF Symbols, which already match.
 struct TabIcon: View {
     let tab: AppTab
+
+    /// Template image for the system tab bar (it only renders `Image`s). Custom stroke icons are
+    /// rasterised once; Home and Plan stay SF Symbols.
+    @MainActor
+    static func image(_ tab: AppTab) -> Image {
+        switch tab {
+        case .activity, .insights:
+            if let cached = cache[tab] { return cached }
+            let renderer = ImageRenderer(content:
+                StrokeIcon(kind: tab)
+                    .stroke(Color.black, style: StrokeStyle(lineWidth: 1.9, lineCap: .round, lineJoin: .round))
+                    .frame(width: 24, height: 24))
+            renderer.scale = 3
+            guard let ui = renderer.uiImage else { return Image(systemName: tab.icon) }
+            let image = Image(uiImage: ui.withRenderingMode(.alwaysTemplate))
+            cache[tab] = image
+            return image
+        default:
+            return Image(systemName: tab.icon)
+        }
+    }
+    @MainActor private static var cache: [AppTab: Image] = [:]
+
     var body: some View {
         switch tab {
         case .activity, .insights:
@@ -183,4 +244,7 @@ extension View {
 }
 
 /// Bottom padding so scroll content clears the floating tab bar.
-let tabBarClearance: CGFloat = 96
+var tabBarClearance: CGFloat {
+    // The native iOS 26 tab bar already insets content; the custom bar floats over it.
+    if #available(iOS 26.0, *) { return 24 } else { return 96 }
+}
