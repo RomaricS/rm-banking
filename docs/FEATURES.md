@@ -117,10 +117,10 @@ Rules that keep it simple:
 
 | # | Feature | Priority |
 |---|---|---|
-| B1 | Budget per pocket or category, per pay period or per month | P1 |
-| B2 | Progress rings / bars with "on track / at risk / over" states and pace marker | P1 |
+| B1 | Budget (spending limit) per pocket or category, per pay period or per month | **P0** |
+| B2 | Progress rings / bars with "on track / at risk / over" states and pace marker | **P0** |
 | B3 | Rollover unused budget to next period (optional) | P2 |
-| B4 | Push alert at 80% / 100% | P1 |
+| B4 | Push alert at 80% (getting close) and 100% (limit exceeded), once per category per period | **P0** |
 
 ### 3.7 Planning & savings goals
 
@@ -130,7 +130,8 @@ Rules that keep it simple:
 | G2 | Goal funding source (pick one): **(a)** linked to a savings account balance, **(b)** earmarked portion of a balance (virtual envelope), or **(c)** manually logged contributions | P0 |
 | G3 | Required pace: "Save $185 per pay period to hit this by June" | P0 |
 | G4 | On-track / behind projection line chart | P1 |
-| G5 | Milestones (25/50/75/100%) with celebration animation + haptics | P1 |
+| G5 | Milestones (25/50/75/100%) with celebration animation + haptics | **P0** |
+| G9 | **Push notification when a goal is reached** (and optional milestone pushes) | **P0** |
 | G6 | **Plan / forecast**: project end-of-period balance from recurring bills + average spend | P1 |
 | G7 | "What if" planner: "If I cut Restaurants by 30%, goal X arrives 2 months earlier" | P2 |
 | G8 | Debt payoff goals (credit card / loan balance trending to 0) | P2 |
@@ -150,14 +151,16 @@ Rules that keep it simple:
 | N1 | Payday summary: "Last period you spent $2,340, saved 18%" | P1 |
 | N2 | Unusual transaction alerts (much larger than usual for that merchant) | P2 |
 | N3 | Weekly digest | P2 |
-| N4 | Home-screen widget: safe-to-spend, days until payday | P1 |
+| N4 | **Widgets**: Home Screen small (safe-to-spend), small (single goal, configurable), medium (pay period + pockets), large (goals); Lock Screen circular / rectangular | **P0** |
+| N6 | Alert settings screen: toggle each notification type | **P0** |
+| N7 | Bills due tomorrow + bank needs reconnecting alerts | P1 |
 | N5 | Ask-your-money chat ("how much did I spend on Uber in October?") using Claude | P2 |
 
 ### 3.10 Security & app basics
 
 | # | Feature | Priority |
 |---|---|---|
-| X1 | Sign in with Apple | P0 |
+| X1 | **Sign in with Apple — the only login method** (no email/password, no Google) | P0 |
 | X2 | Face ID lock on open + privacy blur in app switcher | P0 |
 | X3 | Hide balances toggle (tap/shake to reveal) — Revolut-style | P1 |
 | X4 | Multi-currency display (if any bank is non-USD) | P2 |
@@ -177,11 +180,13 @@ Detailed flows, screens and motion come in the next phase.
 
 ## 5. Suggested MVP scope
 
-Everything marked **P0**: linking 4 banks, unified feed with transfer detection, categories + pockets + rules, pay-period engine, core stats (totals, breakdown, comparison, net cash flow, safe-to-spend), basic goals, Face ID.
+Everything marked **P0**: Sign in with Apple, linking 4 banks, unified feed with transfer detection, categories + pockets + rules, pay-period engine, core stats (totals, breakdown, comparison, net cash flow, safe-to-spend), budgets/limits, goals with milestones, push notifications (goal reached, limit close/exceeded), widgets, Face ID.
+
+Design canvas (flows, screens, motion): https://claude.ai/artifact/H2gQvgcEXUZLpBW9YVKo94
 
 ## 6. Tech direction (to confirm later)
 
-- **iOS**: SwiftUI, iOS 17+, Swift Charts, SwiftData for local cache, Plaid LinkKit
+- **iOS**: **Swift + SwiftUI (decided)**, iOS 17+, Swift Charts, SwiftData for local cache, Plaid LinkKit, WidgetKit, APNs push
 - **Backend**: Supabase — Postgres + Row Level Security, Edge Functions for Plaid token exchange, `/transactions/sync`, webhooks
 - **Animations**: SwiftUI springs, `matchedGeometryEffect`, `contentTransition(.numericText())` for rolling numbers, sensory feedback (haptics)
 
