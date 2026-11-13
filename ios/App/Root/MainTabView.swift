@@ -34,6 +34,14 @@ struct MainTabView: View {
                 }
             }
             .transition(.opacity)
+            // Content fades out under the floating tab bar.
+            LinearGradient(stops: [.init(color: Palette.ground.opacity(0), location: 0),
+                                   .init(color: Palette.ground.opacity(0.72), location: 0.38),
+                                   .init(color: Palette.ground, location: 0.72)],
+                           startPoint: .top, endPoint: .bottom)
+                .frame(height: 150)
+                .ignoresSafeArea(edges: .bottom)
+                .allowsHitTesting(false)
             FloatingTabBar(selection: $tab)
                 .padding(.horizontal, 16)
                 .padding(.bottom, 4)
