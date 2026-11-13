@@ -29,7 +29,6 @@ struct PocketDetailView: View {
 
         return ScrollView {
             ZStack(alignment: .top) {
-                AuroraBackground(tint: color, secondary: color.opacity(0.5), height: 420)
                 VStack(alignment: .leading, spacing: 16) {
                     HStack(spacing: 18) {
                         ZStack {
@@ -109,7 +108,14 @@ struct PocketDetailView: View {
             }
         }
         .scrollIndicators(.hidden)
-        .background(Palette.ground)
+        // Full-bleed: the aurora runs under the status bar / Dynamic Island instead of leaving a dark band.
+        .background {
+            ZStack(alignment: .top) {
+                Palette.ground
+                AuroraBackground(tint: color, secondary: color.opacity(0.5), height: 420)
+            }
+            .ignoresSafeArea()
+        }
         .navigationTitle(pocket.name)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

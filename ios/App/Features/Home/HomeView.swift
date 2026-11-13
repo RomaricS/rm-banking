@@ -13,7 +13,6 @@ struct HomeView: View {
 
         ScrollView {
             ZStack(alignment: .top) {
-                AuroraBackground()
                 VStack(spacing: 22) {
                     topBar
                     hero(ledger: ledger, safe: safe)
@@ -27,7 +26,14 @@ struct HomeView: View {
             }
         }
         .scrollIndicators(.hidden)
-        .background(Palette.ground)
+        // Full-bleed: the aurora runs under the status bar / Dynamic Island instead of leaving a dark band.
+        .background {
+            ZStack(alignment: .top) {
+                Palette.ground
+                AuroraBackground()
+            }
+            .ignoresSafeArea()
+        }
         .refreshable { await app.sync() }
         .toolbar(.hidden, for: .navigationBar)
     }

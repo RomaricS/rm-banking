@@ -33,7 +33,6 @@ struct GoalDetailView: View {
 
         return ScrollView {
             ZStack(alignment: .top) {
-                AuroraBackground(tint: p.isShared ? Color(hex: 0x5B2A6E) : Color(hex: 0x3A4FD9), secondary: color.opacity(0.4), height: 420)
                 VStack(spacing: 16) {
                     if p.isShared, let partner {
                         Text(tr("goal.sharedWith", partner.displayName ?? tr("goal.partner"))).font(.system(size: 13, weight: .semibold)).foregroundStyle(Palette.partner)
@@ -109,7 +108,14 @@ struct GoalDetailView: View {
             }
         }
         .scrollIndicators(.hidden)
-        .background(Palette.ground)
+        // Full-bleed: the aurora runs under the status bar / Dynamic Island instead of leaving a dark band.
+        .background {
+            ZStack(alignment: .top) {
+                Palette.ground
+                AuroraBackground(tint: p.isShared ? Color(hex: 0x5B2A6E) : Color(hex: 0x3A4FD9), secondary: color.opacity(0.4), height: 420)
+            }
+            .ignoresSafeArea()
+        }
         .navigationTitle(goal.name)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
