@@ -20,7 +20,7 @@
 | Stats | Computed on device (AkweKit) from synced transactions | Instant period switching, testable |
 | Notifications | Server evaluates after each sync (budgets 80/100 %, goal milestones/reached, bills due, re-auth) → APNs (token-based .p8) | Works when the app is closed |
 | FX | `fx_rates` table filled daily from frankfurter.app (ECB, no key); balances at today's rate, transactions at their date's rate | Free, reliable for EUR/USD/CAD/GBP/CHF |
-| i18n | `tr("dotted.key")` + `en.lproj` / `fr.lproj` `Localizable.strings`, generated from **`ios/tools/strings.py`** (single table of en+fr); formatters via `Locale` | One table → both languages, easy to check missing keys |
+| i18n | `tr("dotted.key")` + `ios/Shared/Localization/{en,fr}.lproj/Localizable.strings` (shared with the widget), generated from **`ios/tools/strings.py`** (single table of en+fr); formatters via `Locale` | One table → both languages, easy to check missing keys |
 | Theme | Semantic color tokens with light/dark variants in code (`Theme.swift`) | Requirement, matches design canvas |
 
 Design reference: https://claude.ai/artifact/H2gQvgcEXUZLpBW9YVKo94 · Feature spec: `docs/FEATURES.md`
@@ -32,14 +32,14 @@ Design reference: https://claude.ai/artifact/H2gQvgcEXUZLpBW9YVKo94 · Feature s
 - [x] **2. Backend shared logic + tests** — payment method parser (US/CA/FR/UK/DE), transfer pairing, card settlement, category mapping, rules, pay periods, FX
 - [x] **3. Edge functions** — plaid-link-token, plaid-exchange, plaid-sync, plaid-webhook, fx-refresh, notify, goal-invite / goal-join, delete-account
 - [x] **4. AkweKit** — models, Money/FX, pay period engine, stats, budgets, goals projection, safe-to-spend, formatting + tests
-- [ ] **5. App shell** — project.yml, theme, components, localization, AppModel, Supabase client, Sign in with Apple, Face ID lock, tab bar
+- [x] **5. App shell** — project.yml, theme, components, localization, AppModel, Supabase client, Sign in with Apple, Face ID lock, tab bar
 - [x] **6. Onboarding** — welcome, link banks (LinkKit), first sync, pay schedule
-- [ ] **7. Home & Activity** — home, activity feed + filters/search, transaction detail, review inbox, rules
-- [ ] **8. Insights & pockets** — insights (period switcher, curve, tiles, pockets), pocket detail, manage pockets, bills & subscriptions
-- [ ] **9. Plan** — goals, goal detail, new goal, forecast/what-if, shared goals (invite/join)
-- [ ] **10. Settings** — alerts, display currency, appearance, accounts & cards, re-auth, delete account
-- [ ] **11. Widgets & push** — widget extension (small/medium/large/lock screen), APNs registration
-- [ ] **12. Setup guide** — README: Supabase, Plaid, Apple (Sign in with Apple, APNs key, App Group), xcodegen, running tests
+- [x] **7. Home & Activity** — home, activity feed + filters/search, transaction detail, review inbox, rules
+- [x] **8. Insights & pockets** — insights (period switcher, curve, tiles, pockets), pocket detail, manage pockets, bills & subscriptions
+- [x] **9. Plan** — goals, goal detail, new goal, forecast/what-if, shared goals (invite/join)
+- [x] **10. Settings** — alerts, display currency, appearance, accounts & cards, re-auth, delete account
+- [x] **11. Widgets & push** — widget extension (small/medium/large/lock screen), APNs registration
+- [x] **12. Setup guide** — README: Supabase, Plaid, Apple (Sign in with Apple, APNs key, App Group), xcodegen, running tests
 
 ## Log
 
@@ -54,3 +54,18 @@ Design reference: https://claude.ai/artifact/H2gQvgcEXUZLpBW9YVKo94 · Feature s
 - 2026-11-13 · 6 · Onboarding: PlaidLinker (LinkKit wrapper), WelcomeView (Sign in with Apple + nonce, floating chips), OnboardingFlow (LinkBanks w/ 4 slots + re-auth, FirstSync, PayScheduleView)
 - 2026-11-13 · 7 (partial) · HomeView (+PayPeriodBar, TransactionRow), ActivityView (search, filters, review banner, context menu), TransactionDetailView (rule suggestion, merchant history, CategoryPicker, SplitView), ReviewView (swipe cards). Model renamed `Category` → `TxCategory` (clash with ObjC `Category` typealias on iOS)
   - NEXT: Insights (InsightsView, PocketDetailView, ManagePocketsView, RecurringView, budget editor), Plan (PlanView, GoalDetailView, NewGoalView, Forecast, JoinGoalSheet, InviteSheet), Settings (SettingsView, AlertSettingsView, CurrencyView, AccountsView), Widgets, strings.py + Localizable, assets/app icon, README
+- 2026-11-13 · 8 · InsightsView (period switcher w/ prev/next, Swift Charts curve vs average + plan line, tiles, pockets bar + list w/ change, limits, top merchants, payment-method split, weekday heatmap), PocketDetailView (ring, 6-period bars, categories, tx), BudgetEditor, ManagePocketsView (drag & drop between pockets, editor, per-category limits), RecurringView (7-day strip, bills, subscriptions, price increases)
+- 2026-11-13 · 9 · PlanView (Goals/Forecast), GoalsList + what-if tip, GoalCard, GoalDetailView (ring or split ring, projection chart, milestones + burst, funding, activity feed, cheer, add/withdraw, share/leave/archive), NewGoalView (live per-period amount), ForecastView (balance to payday, what-if slider → apply as limit), InviteSheet (privacy toggles, ShareLink), JoinGoalSheet
+- 2026-11-13 · 10 · SettingsView (accounts, pay schedule, currency, pockets, alerts, appearance, Face ID, hide balances, language → iOS settings, sign out, delete), AlertSettingsView, CurrencyView, AccountsView (net worth, banks, card type tags, credit utilization, deferred cycle, unlink, sync), AccountEditor (nickname, totals, debit vs deferred)
+- 2026-11-13 · 11 · Widgets: safe-to-spend (small, circular, rectangular, inline), pay period (medium), goal (small), goals (large); App Group snapshot; push registration in AppDelegate
+- 2026-11-13 · 12 · README setup guide, CI workflow (deno check+test, swift test, strings check), app icon rendered (default/dark/tinted), asset catalog, strings.py (373 keys en+fr, validated)
+
+## Status: first full pass complete — NOT yet compiled in Xcode
+
+Everything above was written without access to Xcode (this environment is Linux). AkweKit + backend logic are compiled and tested here; the SwiftUI/LinkKit/Supabase code has not been built yet. Expect a short round of compile fixes on first `xcodegen && build`.
+
+### Resume checklist (in order)
+1. `cd ios && xcodegen && open Akwe.xcodeproj`, set signing team, build → fix any compile errors (likely spots: supabase-swift API names if the resolved version differs — `Backend.swift`; LinkKit `LinkTokenConfiguration` / `Plaid.create` — `PlaidLinker.swift`; Charts generic inference in `InsightsView`/`GoalDetailView`).
+2. Run in demo mode, walk every screen against the design canvas.
+3. Supabase + Plaid sandbox setup per README, link a sandbox bank, verify sync → categories → transfers.
+4. Known gaps / next ideas: widget tap deep links (`akwe://home|plan|insights`) only open the app; goal widget always shows the first goal (make it configurable with an AppIntent); CSV export; receipts; ask-your-money chat (P2).

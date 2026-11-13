@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  backend:
+    name: Backend logic (Deno)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Type-check edge functions
+        working-directory: backend/supabase/functions
+        run: deno check */index.ts
+      - name: Unit tests
+        working-directory: backend/supabase/functions
+        run: deno test tests/
+
+  akwekit:
+    name: AkweKit (Swift, Linux)
+    runs-on: ubuntu-latest
+    container: swift:6.0
+    steps:
+      - uses: actions/checkout@v4
+      - name: swift test
+        working-directory: ios/Packages/AkweKit
+        run: swift test
+
+  strings:
+    name: Localization table
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Every tr() key exists in en + fr
+        run: python3 ios/tools/strings.py && git diff --exit-code ios/Shared/Localization

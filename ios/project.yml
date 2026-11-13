@@ -43,6 +43,7 @@ targets:
           - "Config/*.example"
     resources:
       - path: App/Resources
+      - path: Shared/Localization
     dependencies:
       - package: Supabase
       - package: LinkKit
@@ -88,6 +89,8 @@ targets:
     platform: iOS
     sources:
       - path: Widgets
+      - path: Shared/Localization
+        buildPhase: resources
     dependencies:
       - package: AkweKit
       - sdk: WidgetKit.framework
