@@ -23,6 +23,22 @@ Design language: Revolut-style — dark-first, big numbers, glassy cards, fluid 
 | **Plaid sync isn't instant** | Transactions arrive via webhooks, typically minutes to hours after the card swipe. Pending → posted transitions must be handled. |
 | **Up to 4 banks per user** | 4 Plaid *Items*; each Item may expose several accounts (checking, savings, credit card). |
 
+## 2b. Regions & banks
+
+**Primary markets: Europe, United States, Canada.** Anything else is a bonus.
+
+| Region | Plaid coverage | Your banks | Notes |
+|---|---|---|---|
+| United States | Plaid core market | — | Account type/subtype gives debit vs credit directly |
+| Canada | Supported | Your Canadian bank(s) | Debit = Interac (`INTERAC`, `IDP PURCHASE`); `E-TRANSFER` / `Interac e-Transfer` = transfer; CAD |
+| France / EU | Supported through Plaid's EU coverage | **La Banque Postale**, **Revolut** (both already used with Plaid) | Labels: `ACHAT CB` / `CB` = card, `PRLV` / `PRELEVEMENT` = direct debit, `VIR` / `VIREMENT` = transfer, `RETRAIT DAB` = ATM, `CHQ` = check. Deferred-debit cards possible (LBP offers them) |
+| UK | Supported | — | `DD` = direct debit, `FPS` / Faster Payment = transfer, `SO` = standing order |
+| Germany & others | Supported | — | `Kartenzahlung` = card, `Lastschrift` = direct debit, `Überweisung` = transfer |
+
+- **Revolut** exposes one account per currency (EUR, USD, GBP…). Each comes through Plaid as its own account with its own currency, so it shows as several accounts under one bank. Moving money between your own Revolut currency accounts is detected as a transfer, not spending.
+- Plaid Link is opened with the user's country codes (`US`, `CA`, `FR`, `GB`, `DE`, `ES`, `IE`, `NL`, …) so the bank search shows the right institutions.
+- The label rules are a small table per country, kept in the backend so they can be updated without shipping a new app version.
+
 ## 3. Features
 
 Priority legend: **P0** = MVP, **P1** = shortly after, **P2** = later / nice to have.
@@ -170,7 +186,7 @@ Rules that keep it simple:
 | X1 | **Sign in with Apple — the only login method** (no email/password, no Google) | P0 |
 | X2 | Face ID lock on open + privacy blur in app switcher | P0 |
 | X3 | Hide balances toggle (tap/shake to reveal) — Revolut-style | P1 |
-| X4 | **Display currency setting** (USD / CAD / EUR, extensible): every amount, chart, budget and goal converts. Balances at today's rate; past transactions at their own date's rate; original amount shown under foreign transactions | **P0** |
+| X4 | **Display currency setting** (USD / CAD / EUR / GBP / CHF, more later): every amount, chart, budget and goal converts. Balances at today's rate; past transactions at their own date's rate; original amount shown under foreign transactions | **P0** |
 | X5 | CSV export | P2 |
 | X6 | Delete account & all data, unlink banks | P0 |
 
@@ -204,7 +220,7 @@ Design canvas (flows, screens, motion): https://claude.ai/artifact/H2gQvgcEXUZLp
 3. **Pay schedule** — what's your pay frequency? Do you have multiple income sources?
 4. **Budgets** — do you want spending limits in MVP, or just stats first?
 5. **Single user only**, or should a partner be able to share the view later?
-6. **Currencies** — which countries are your banks in (US / Canada / France)? Is the French bank supported by Plaid (Plaid's EU coverage includes France, but check your specific bank)?
+6. ~~Currencies~~ — answered: banks in France (La Banque Postale, Revolut) and Canada; target markets Europe + US + Canada.
 7. **Plaid account** — do you already have Plaid API keys (Sandbox / Production)?
 8. Anything in P1/P2 you want promoted to MVP — or cut?
 
