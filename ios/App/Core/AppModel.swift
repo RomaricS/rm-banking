@@ -250,8 +250,8 @@ final class AppModel {
         guard let i = accounts.firstIndex(where: { $0.id == account.id }) else { return }
         accounts[i] = account
         writeWidgetSnapshot()
-        struct U: Encodable { let nickname: String?; let includeInTotals: Bool; let color: String?; let cardKind: CardKind? }
-        do { try await backend?.update("accounts", id: account.id, U(nickname: account.nickname, includeInTotals: account.includeInTotals, color: account.color, cardKind: account.cardKind)) } catch { show(error) }
+        struct U: Encodable { let nickname: String?; let includeInTotals: Bool; let hidden: Bool; let color: String?; let cardKind: CardKind? }
+        do { try await backend?.update("accounts", id: account.id, U(nickname: account.nickname, includeInTotals: account.includeInTotals, hidden: account.isHidden, color: account.color, cardKind: account.cardKind)) } catch { show(error) }
     }
 
     // MARK: Onboarding

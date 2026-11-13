@@ -122,7 +122,7 @@ struct ActivityView: View {
             HStack(spacing: 8) {
                 Menu {
                     Button(tr("activity.allAccounts")) { accountFilter = nil }
-                    ForEach(app.accounts) { a in Button("\(a.displayName) ··\(a.mask ?? "")") { accountFilter = a.id } }
+                    ForEach(app.accounts.filter { !$0.isHidden }) { a in Button("\(a.displayName) ··\(a.mask ?? "")") { accountFilter = a.id } }
                 } label: { chip(accountFilter.flatMap { id in app.accounts.first { $0.id == id }?.displayName } ?? tr("activity.allAccounts"), active: accountFilter != nil) }
 
                 Menu {

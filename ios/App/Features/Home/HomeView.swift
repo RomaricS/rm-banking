@@ -149,7 +149,8 @@ struct HomeView: View {
             }
             ScrollView(.horizontal) {
                 HStack(spacing: 10) {
-                    ForEach(app.accounts.sorted { $0.sort < $1.sort }) { a in
+                    // Counted accounts first; left-out ones follow as dashed "ghost" cards.
+                    ForEach(app.accounts.filter { !$0.isHidden }.sorted { ($0.includeInTotals ? 0 : 1, $0.sort) < ($1.includeInTotals ? 0 : 1, $1.sort) }) { a in
                         NavigationLink(value: Route.accounts) {
                             VStack(alignment: .leading) {
                                 HStack(spacing: 8) {
@@ -157,11 +158,30 @@ struct HomeView: View {
                                     Text("\(a.displayName)\(a.mask.map { " ··\($0)" } ?? "")").font(.system(size: 13)).foregroundStyle(Palette.text2).lineLimit(1)
                                 }
                                 Spacer()
-                                AmountText(amount: a.currentBalance ?? 0, currency: a.currency, font: .system(size: 17, weight: .bold), cents: false)
+                                HStack(spacing: 6) {
+                                    AmountText(amount: a.currentBalance ?? 0, currency: a.currency, font: .system(size: 17, weight: .bold), cents: false)
+                                    if !a.includeInTotals {
+                                        Image(systemName: "minus.circle").font(.system(size: 12, weight: .semibold)).foregroundStyle(Palette.text3)
+                                    }
+                                }
                             }
                             .padding(12)
                             .frame(width: 140, height: 92, alignment: .leading)
-                            .background(Palette.card, in: RoundedRectangle(cornerRadius: Radius.tile, style: .continuous))
+                            .countedStyle(a.includeInTotals, fill: Palette.card, radius: Radius.tile)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityValue(a.includeInTotals ? "" : tr("totals.leftOut"))
+                    }
+                    let hiddenCount = app.accounts.filter(\.isHidden).count
+                    if hiddenCount > 0 {
+                        NavigationLink(value: Route.accounts) {
+                            VStack(spacing: 6) {
+                                Image(systemName: "eye.slash").font(.system(size: 18, weight: .semibold))
+                                Text(tr("home.hiddenCount", hiddenCount)).font(.system(size: 13, weight: .semibold))
+                            }
+                            .foregroundStyle(Palette.text2)
+                            .frame(width: 92, height: 92)
+                            .background(Palette.text.opacity(0.05), in: RoundedRectangle(cornerRadius: Radius.tile, style: .continuous))
                         }
                         .buttonStyle(.plain)
                     }

@@ -115,17 +115,21 @@ public struct Account: Codable, Hashable, Identifiable, Sendable {
     public var creditLimit: Decimal?
     public var cardKind: CardKind?
     public var includeInTotals: Bool
+    /// Hidden from Home cards and account filters (still listed under Accounts › Hidden).
+    /// Optional so cached data from before the column existed still decodes.
+    public var hidden: Bool?
     public var color: String?
     public var sort: Int
 
-    public init(id: UUID, itemId: UUID, name: String, nickname: String? = nil, mask: String? = nil, type: String, subtype: String? = nil, currency: String, currentBalance: Decimal? = nil, availableBalance: Decimal? = nil, creditLimit: Decimal? = nil, cardKind: CardKind? = nil, includeInTotals: Bool = true, color: String? = nil, sort: Int = 0) {
+    public init(id: UUID, itemId: UUID, name: String, nickname: String? = nil, mask: String? = nil, type: String, subtype: String? = nil, currency: String, currentBalance: Decimal? = nil, availableBalance: Decimal? = nil, creditLimit: Decimal? = nil, cardKind: CardKind? = nil, includeInTotals: Bool = true, hidden: Bool = false, color: String? = nil, sort: Int = 0) {
         self.id = id; self.itemId = itemId; self.name = name; self.nickname = nickname; self.mask = mask
         self.type = type; self.subtype = subtype; self.currency = currency; self.currentBalance = currentBalance
         self.availableBalance = availableBalance; self.creditLimit = creditLimit; self.cardKind = cardKind
-        self.includeInTotals = includeInTotals; self.color = color; self.sort = sort
+        self.includeInTotals = includeInTotals; self.hidden = hidden; self.color = color; self.sort = sort
     }
 
     public var displayName: String { nickname ?? name }
+    public var isHidden: Bool { hidden ?? false }
     public var isCredit: Bool { type == "credit" }
     public var isLiability: Bool { type == "credit" || type == "loan" }
 }

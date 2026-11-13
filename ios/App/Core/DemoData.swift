@@ -34,8 +34,8 @@ enum DemoData {
 
         let checking = Account(id: UUID(), itemId: northwind.id, name: "Checking", mask: "21", type: "depository", subtype: "checking", currency: "USD", currentBalance: 4212.18, availableBalance: 4212.18, cardKind: .debit, color: "#A99FFF", sort: 0)
         let savings = Account(id: UUID(), itemId: northwind.id, name: "Savings", mask: "12", type: "depository", subtype: "savings", currency: "USD", currentBalance: 6950, cardKind: nil, color: "#A99FFF", sort: 1)
-        let card = Account(id: UUID(), itemId: harbor.id, name: "Mastercard", mask: "3307", type: "credit", subtype: "credit card", currency: "USD", currentBalance: -842.40, creditLimit: 5000, cardKind: .credit, color: "#FFB86B", sort: 2)
-        let compte = Account(id: UUID(), itemId: lbp.id, name: "Compte courant", mask: "40", type: "depository", subtype: "checking", currency: "EUR", currentBalance: 1980, cardKind: .deferred, color: "#C084FC", sort: 3)
+        let card = Account(id: UUID(), itemId: harbor.id, name: "Mastercard", mask: "3307", type: "credit", subtype: "credit card", currency: "USD", currentBalance: -842.40, creditLimit: 5000, cardKind: .credit, hidden: true, color: "#FFB86B", sort: 2)
+        let compte = Account(id: UUID(), itemId: lbp.id, name: "Compte courant", mask: "40", type: "depository", subtype: "checking", currency: "EUR", currentBalance: 1980, cardKind: .deferred, includeInTotals: false, color: "#C084FC", sort: 3)
 
         func pocket(_ key: String, _ name: String, _ icon: String, _ color: String, _ sort: Int, income: Bool = false) -> Pocket {
             Pocket(id: UUID(), key: key, name: name, icon: icon, color: color, isIncome: income, sort: sort)

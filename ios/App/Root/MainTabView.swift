@@ -24,7 +24,18 @@ struct MainTabView: View {
         #endif
         return .home
     }()
-    @State private var homePath = NavigationPath()
+    @State private var homePath: NavigationPath = {
+        var path = NavigationPath()
+        #if DEBUG
+        // Screenshots / UI checks: launch with `-AkweRoute accounts|review` to open that screen.
+        switch UserDefaults.standard.string(forKey: "AkweRoute") {
+        case "accounts": path.append(Route.accounts)
+        case "review": path.append(Route.review)
+        default: break
+        }
+        #endif
+        return path
+    }()
     @State private var activityPath = NavigationPath()
     @State private var insightsPath = NavigationPath()
     @State private var planPath = NavigationPath()

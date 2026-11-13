@@ -21,11 +21,7 @@ struct ReviewView: View {
                         .buttonStyle(SecondaryButtonStyle())
                 }
             }
-            HStack(spacing: 4) {
-                ForEach(0..<max(total, 1), id: \.self) { i in
-                    Capsule().fill(i < total - queue.count ? Palette.positive : (i == total - queue.count ? Palette.text : Palette.text.opacity(0.14))).frame(height: 4)
-                }
-            }
+            progress
 
             ZStack {
                 if queue.isEmpty {
@@ -65,6 +61,9 @@ struct ReviewView: View {
             }
         }
         .padding(.horizontal, 16)
+        // Never wider than the screen, whatever a child asks for.
+        .frame(maxWidth: .infinity)
+        .clipped()
         .padding(.bottom, tabBarClearance - 20)
         .background(Palette.ground)
         .navigationTitle(tr("review.title"))
@@ -75,6 +74,22 @@ struct ReviewView: View {
         .sheet(item: $picking) { t in
             CategoryPicker(tx: t) { _ in }
                 .onDisappear { if app.transactions.first(where: { $0.id == t.id })?.needsReview == false { advance() } }
+        }
+    }
+
+    /// One segment per transaction for short queues; a single bar for long ones. (122 segments
+    /// with 4-pt gaps needed ~480 pt and pushed the whole screen wider than the display.)
+    @ViewBuilder private var progress: some View {
+        let done = total - queue.count
+        if total <= 12 {
+            HStack(spacing: 4) {
+                ForEach(0..<max(total, 1), id: \.self) { i in
+                    Capsule().fill(i < done ? Palette.positive : (i == done ? Palette.text : Palette.text.opacity(0.14))).frame(height: 4)
+                }
+            }
+        } else {
+            ProgressBar(fraction: total > 0 ? Double(done) / Double(total) : 0, color: Palette.positive, height: 4)
+                .animation(Motion.smooth, value: done)
         }
     }
 
@@ -144,7 +159,7 @@ private struct ReviewCard: View {
             }
             VStack(alignment: .leading, spacing: 4) {
                 AmountText(amount: tx.amount, currency: tx.currency, font: .system(size: 40, weight: .heavy), cents: true, hideable: false)
-                Text(tx.title).font(.system(size: 18, weight: .semibold))
+                Text(tx.title).font(.system(size: 18, weight: .semibold)).lineLimit(2)
                 Text("\(app.accounts.first { $0.id == tx.accountId }?.displayName ?? "") · \(tx.paymentMethod.label)").font(.system(size: 14)).foregroundStyle(Palette.text2)
             }
             VStack(alignment: .leading, spacing: 8) {
@@ -160,14 +175,19 @@ private struct ReviewCard: View {
             if !siblings.isEmpty {
                 VStack(alignment: .leading, spacing: 8) {
                     Text(tr("review.orPick")).font(.system(size: 13)).foregroundStyle(Palette.text2)
-                    HStack(spacing: 8) {
-                        ForEach(Array(siblings)) { c in
-                            Button(c.name) { onPick(c.id) }
-                                .font(.system(size: 14, weight: .semibold)).foregroundStyle(Palette.text)
-                                .padding(.horizontal, 14).frame(height: 36)
-                                .overlay(Capsule().stroke(Palette.text.opacity(0.14)))
+                    ScrollView(.horizontal) {
+                        HStack(spacing: 8) {
+                            ForEach(Array(siblings)) { c in
+                                Button(c.name) { onPick(c.id) }
+                                    .font(.system(size: 14, weight: .semibold)).foregroundStyle(Palette.text)
+                                    .lineLimit(1)
+                                    .padding(.horizontal, 14).frame(height: 36)
+                                    .overlay(Capsule().stroke(Palette.text.opacity(0.14)))
+                            }
                         }
+                        .padding(1)
                     }
+                    .scrollIndicators(.hidden)
                 }
             }
             Spacer(minLength: 0)

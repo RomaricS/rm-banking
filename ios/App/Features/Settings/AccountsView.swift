@@ -7,11 +7,13 @@ struct AccountsView: View {
     @State private var editing: Account?
     @State private var removing: BankItem?
     @State private var linking = false
+    @State private var showHidden = false
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
                 let nw = app.ledger.netWorth
+                TotalCompositionCard()
                 HStack {
                     stat(tr("accounts.assets"), nw.assets, Palette.text)
                     stat(tr("accounts.liabilities"), nw.liabilities, Palette.over)
@@ -20,6 +22,8 @@ struct AccountsView: View {
                 ForEach(Array(app.items.enumerated()), id: \.element.id) { i, item in
                     bankCard(item).rise(i)
                 }
+
+                hiddenSection
 
                 if app.items.count < 4 && !app.isDemo {
                     Button { linking = true } label: {
@@ -40,6 +44,7 @@ struct AccountsView: View {
         .scrollIndicators(.hidden)
         .background(Palette.ground)
         .navigationTitle(tr("accounts.title"))
+        .navigationBarTitleDisplayMode(.inline)
         .refreshable { await app.sync() }
         .sheet(item: $editing) { a in AccountEditor(account: a) }
         .sheet(isPresented: $linking) { NavigationStack { LinkBanksView() } }
@@ -57,7 +62,7 @@ struct AccountsView: View {
     }
 
     private func bankCard(_ item: BankItem) -> some View {
-        let accounts = app.accounts.filter { $0.itemId == item.id }.sorted { $0.sort < $1.sort }
+        let accounts = app.accounts.filter { $0.itemId == item.id && !$0.isHidden }.sorted { $0.sort < $1.sort }
         return VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 10) {
                 BankBadge(name: item.institutionName, color: accounts.first.map(app.accountColor) ?? Palette.iris)
@@ -72,8 +77,15 @@ struct AccountsView: View {
             if item.status.needsAttention {
                 BankRow(item: item, accounts: accounts)
             }
-            ForEach(accounts) { a in
-                Button { editing = a } label: { accountRow(a) }.buttonStyle(.plain)
+            ForEach(accounts) { a in accountRow(a) }
+            let hiddenHere = app.accounts.filter { $0.itemId == item.id && $0.isHidden }.count
+            if hiddenHere > 0 {
+                Button { withAnimation(Motion.snappy) { showHidden = true } } label: {
+                    Label(tr("accounts.hiddenInBank", hiddenHere), systemImage: "eye.slash")
+                        .font(.system(size: 13, weight: .semibold)).foregroundStyle(Palette.text2)
+                        .frame(minHeight: 32)
+                }
+                .buttonStyle(.plain)
             }
             if let synced = item.lastSyncedAt {
                 Text(tr("accounts.synced", synced.formatted(.relative(presentation: .named)))).font(.system(size: 12)).foregroundStyle(Palette.text3)
@@ -93,16 +105,13 @@ struct AccountsView: View {
             }
         }()
         let cycle = kind == .deferred ? deferredCycle(a) : nil
-        return VStack(alignment: .leading, spacing: 8) {
+        let content = VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 12) {
                 RoundedRectangle(cornerRadius: 6).fill(tint.opacity(0.8)).frame(width: 44, height: 30)
                     .overlay(alignment: .bottomLeading) { Capsule().fill(.white.opacity(0.8)).frame(width: 12, height: 3).padding(6) }
                 VStack(alignment: .leading, spacing: 3) {
                     Text("\(a.displayName)\(a.mask.map { " ··\($0)" } ?? "")").font(.system(size: 14, weight: .semibold))
-                    HStack(spacing: 6) {
-                        if let tag { Tag(text: tag, color: tint) }
-                        if !a.includeInTotals { Tag(text: tr("accounts.hidden")) }
-                    }
+                    if let tag { Tag(text: tag, color: tint) }
                 }
                 Spacer()
                 AmountText(amount: a.currentBalance ?? 0, currency: a.currency, font: .system(size: 15, weight: .bold), cents: false)
@@ -117,8 +126,49 @@ struct AccountsView: View {
                 Text(tr("card.deferredCycle", money(cycle.total, a.currency, cents: false), cycle.debitDay.short)).font(.system(size: 12)).foregroundStyle(Palette.text2)
             }
         }
-        .padding(12)
-        .background(Palette.text.opacity(0.04), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        return VStack(alignment: .leading, spacing: 4) {
+            Button { editing = a } label: { content.contentShape(Rectangle()) }
+                .buttonStyle(.plain)
+                .leftOutContent(!a.includeInTotals)
+            HStack(spacing: 8) {
+                InTotalToggle(isOn: a.includeInTotals) { update(a) { $0.includeInTotals.toggle() } }
+                VisibilityToggle(isShown: !a.isHidden) { update(a) { $0.hidden = !$0.isHidden } }
+                Spacer()
+            }
+        }
+        .padding(.horizontal, 12).padding(.top, 12).padding(.bottom, 2)
+        .countedBackground(a.includeInTotals, fill: Palette.text.opacity(0.04), radius: 16)
+    }
+
+    private func update(_ a: Account, _ change: (inout Account) -> Void) {
+        Haptics.selection()
+        var updated = a
+        change(&updated)
+        // Row styles animate on the flags (see countedBackground / leftOutContent).
+        withAnimation(Motion.snappy) {
+            if let i = app.accounts.firstIndex(where: { $0.id == a.id }) { app.accounts[i] = updated }
+        }
+        Task { await app.updateAccount(updated) }
+    }
+
+    /// Hidden accounts live here, out of the bank cards, so they're never lost.
+    @ViewBuilder private var hiddenSection: some View {
+        let hidden = app.accounts.filter(\.isHidden).sorted { $0.sort < $1.sort }
+        if !hidden.isEmpty {
+            DisclosureGroup(isExpanded: $showHidden) {
+                VStack(spacing: 10) {
+                    ForEach(hidden) { a in accountRow(a) }
+                    Text(tr("accounts.hiddenHint")).font(.system(size: 12)).foregroundStyle(Palette.text3)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .padding(.top, 10)
+            } label: {
+                Label(tr("accounts.hiddenSection", hidden.count), systemImage: "eye.slash")
+                    .font(.system(size: 15, weight: .bold)).foregroundStyle(Palette.text)
+            }
+            .tint(Palette.text2)
+            .card(padding: 14)
+        }
     }
 
     /// Deferred card: purchases since the 1st, debited on the last day of the month.
@@ -141,7 +191,10 @@ struct AccountEditor: View {
         NavigationStack {
             Form {
                 TextField(tr("accounts.nickname"), text: Binding(get: { account.nickname ?? "" }, set: { account.nickname = $0.isEmpty ? nil : $0 }), prompt: Text(account.name))
-                Toggle(tr("accounts.includeInTotals"), isOn: $account.includeInTotals).tint(Palette.positive)
+                Section {
+                    Toggle(tr("accounts.includeInTotals"), isOn: $account.includeInTotals).tint(Palette.positive)
+                    Toggle(tr("accounts.showOnHome"), isOn: Binding(get: { !account.isHidden }, set: { account.hidden = !$0 })).tint(Palette.iris)
+                } footer: { Text(tr("accounts.flagsFooter")) }
                 if account.type == "depository" {
                     Section {
                         Picker(tr("accounts.cardType"), selection: Binding(get: { account.cardKind ?? .debit }, set: { account.cardKind = $0 })) {

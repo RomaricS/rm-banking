@@ -6,11 +6,15 @@
 "accounts.assets" = "Assets";
 "accounts.cardType" = "Card on this account";
 "accounts.cardTypeHint" = "Deferred debit (débit différé): purchases count on the day you buy; the month-end lump is recognised as a card settlement, not new spending.";
-"accounts.hidden" = "Not in totals";
+"accounts.flagsFooter" = "Counted accounts add up to your total balance and net worth. Hidden accounts leave the Home cards and filters but stay listed here. The two are independent.";
+"accounts.hiddenHint" = "Not shown on Home or in filters. Whether they count in your total is set separately.";
+"accounts.hiddenInBank" = "Hidden here: %ld";
+"accounts.hiddenSection" = "Hidden accounts (%ld)";
 "accounts.includeInTotals" = "Include in totals";
 "accounts.liabilities" = "Owed";
 "accounts.methodsTitle" = "Every transaction gets a payment method";
 "accounts.nickname" = "Nickname";
+"accounts.showOnHome" = "Show on Home";
 "accounts.syncNow" = "Sync now";
 "accounts.synced" = "Synced %@";
 "accounts.title" = "Accounts & cards";
@@ -176,6 +180,7 @@
 "home.banksCount" = "%ld of %ld banks";
 "home.billsDue" = "%@ bills still due";
 "home.dayOf" = "day %ld of %ld";
+"home.hiddenCount" = "%ld hidden";
 "home.hideBalances" = "Hide balances";
 "home.noTx" = "No transactions yet";
 "home.noTxHint" = "Link a bank to see your spending here.";
@@ -344,6 +349,11 @@
 "toast.error" = "Something went wrong";
 "toast.joinedGoal" = "You joined the goal";
 "toast.synced" = "Synced just now";
+"totals.counted" = "In total";
+"totals.countedSummary" = "%ld accounts counted";
+"totals.leftOut" = "Not counted";
+"totals.leftOutSummary" = "%ld not counted · %@ left out of your total";
+"totals.title" = "What’s in your total";
 "tx.account" = "Account";
 "tx.bankLabel" = "Bank label";
 "tx.category" = "Category";
@@ -363,6 +373,8 @@
 "tx.ruleCreated" = "Rule created · %ld transactions updated";
 "tx.split" = "Split";
 "tx.uncategorized" = "Uncategorized";
+"vis.hidden" = "Hidden";
+"vis.shown" = "Shown";
 "welcome.chip.food" = "Food";
 "welcome.chip.goal" = "Japan trip";
 "welcome.chip.onTrack" = "On track";

@@ -6,11 +6,15 @@
 "accounts.assets" = "Actifs";
 "accounts.cardType" = "Carte de ce compte";
 "accounts.cardTypeHint" = "Débit différé : les achats comptent le jour de l’achat ; le prélèvement de fin de mois est reconnu comme relevé carte, pas comme une nouvelle dépense.";
-"accounts.hidden" = "Hors totaux";
+"accounts.flagsFooter" = "Les comptes comptés forment votre solde total et votre patrimoine. Les comptes masqués quittent l’accueil et les filtres mais restent listés ici. Les deux réglages sont indépendants.";
+"accounts.hiddenHint" = "Absents de l’accueil et des filtres. Leur prise en compte dans le total se règle à part.";
+"accounts.hiddenInBank" = "Masqués ici : %ld";
+"accounts.hiddenSection" = "Comptes masqués (%ld)";
 "accounts.includeInTotals" = "Inclure dans les totaux";
 "accounts.liabilities" = "Dettes";
 "accounts.methodsTitle" = "Chaque opération indique son moyen de paiement";
 "accounts.nickname" = "Surnom";
+"accounts.showOnHome" = "Afficher sur l’accueil";
 "accounts.syncNow" = "Synchroniser";
 "accounts.synced" = "Synchronisé %@";
 "accounts.title" = "Comptes et cartes";
@@ -176,6 +180,7 @@
 "home.banksCount" = "%ld banques sur %ld";
 "home.billsDue" = "%@ de factures à venir";
 "home.dayOf" = "jour %ld sur %ld";
+"home.hiddenCount" = "%ld masqués";
 "home.hideBalances" = "Masquer les soldes";
 "home.noTx" = "Aucune opération";
 "home.noTxHint" = "Reliez une banque pour voir vos dépenses ici.";
@@ -344,6 +349,11 @@
 "toast.error" = "Un problème est survenu";
 "toast.joinedGoal" = "Vous avez rejoint l’objectif";
 "toast.synced" = "Synchronisé à l’instant";
+"totals.counted" = "Compté";
+"totals.countedSummary" = "%ld comptes comptés";
+"totals.leftOut" = "Non compté";
+"totals.leftOutSummary" = "%ld non comptés · %@ hors de votre total";
+"totals.title" = "Ce qui compte dans votre total";
 "tx.account" = "Compte";
 "tx.bankLabel" = "Libellé bancaire";
 "tx.category" = "Catégorie";
@@ -363,6 +373,8 @@
 "tx.ruleCreated" = "Règle créée · %ld opérations mises à jour";
 "tx.split" = "Répartir";
 "tx.uncategorized" = "Non catégorisé";
+"vis.hidden" = "Masqué";
+"vis.shown" = "Affiché";
 "welcome.chip.food" = "Alimentation";
 "welcome.chip.goal" = "Voyage au Japon";
 "welcome.chip.onTrack" = "Dans les temps";
