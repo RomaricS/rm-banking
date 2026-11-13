@@ -1,0 +1,28 @@
+# macOS / Xcode
+.DS_Store
+*.xcodeproj/
+*.xcworkspace/
+xcuserdata/
+DerivedData/
+build/
+.build/
+.swiftpm/
+Package.resolved
+*.ipa
+*.dSYM.zip
+
+# Secrets
+.env
+.env.*
+!.env.example
+*.p8
+*.p12
+ios/App/Config/Secrets.xcconfig
+
+# Supabase
+backend/supabase/.branches/
+backend/supabase/.temp/
+backend/supabase/functions/.env
+
+# Node / Deno
+node_modules/

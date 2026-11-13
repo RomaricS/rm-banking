@@ -1,0 +1,35 @@
+# Supabase CLI config for akwe (local dev: `supabase start` from /backend)
+project_id = "akwe"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public"]          # "private" is intentionally NOT exposed
+extra_search_path = ["public", "extensions"]
+max_rows = 5000
+
+[db]
+port = 54322
+major_version = 15
+
+[auth]
+enabled = true
+site_url = "akwe://auth"
+additional_redirect_urls = ["akwe://auth"]
+jwt_expiry = 3600
+enable_refresh_token_rotation = true
+
+[auth.external.apple]
+enabled = true
+# Bundle ID of the iOS app; native Sign in with Apple uses id tokens, no secret needed for that flow.
+client_id = "env(APPLE_BUNDLE_ID)"
+secret = ""
+
+[functions.plaid-webhook]
+verify_jwt = false            # Plaid calls it; we verify Plaid's own JWT signature instead
+
+[functions.fx-refresh]
+verify_jwt = true
+
+[functions.notify]
+verify_jwt = true
