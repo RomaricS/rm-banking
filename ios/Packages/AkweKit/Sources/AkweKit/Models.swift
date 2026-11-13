@@ -297,6 +297,10 @@ public struct GoalFundingSettings: Codable, Hashable, Sendable {
     public var accountId: UUID?
     public var earmarkAmount: Decimal?
     public var currentAmount: Decimal
+    public init(goalId: UUID, userId: UUID, funding: GoalFunding, accountId: UUID? = nil, earmarkAmount: Decimal? = nil, currentAmount: Decimal = 0) {
+        self.goalId = goalId; self.userId = userId; self.funding = funding
+        self.accountId = accountId; self.earmarkAmount = earmarkAmount; self.currentAmount = currentAmount
+    }
 }
 
 public struct GoalEvent: Codable, Hashable, Identifiable, Sendable {

@@ -1,0 +1,10 @@
+// Shared build settings. Real values go in Secrets.xcconfig (git-ignored).
+// Copy Secrets.xcconfig.example → Secrets.xcconfig and fill it in.
+// If SUPABASE_URL is empty the app runs in DEMO MODE with sample data (no login, no network).
+
+SUPABASE_URL =
+SUPABASE_ANON_KEY =
+AKWE_TEAM_ID =
+AKWE_LINK_DOMAIN = akwe.app
+
+#include? "Secrets.xcconfig"
