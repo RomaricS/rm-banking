@@ -20,6 +20,8 @@ alter table public.goal_events enable row level security;
 alter table public.goal_invites enable row level security;
 alter table public.fx_rates enable row level security;
 alter table public.notification_log enable row level security;
+alter table public.plaid_secrets enable row level security;
+revoke all on public.plaid_secrets from anon, authenticated;
 
 -- Simple "own rows" tables -------------------------------------------------
 create policy "own profile" on public.profiles

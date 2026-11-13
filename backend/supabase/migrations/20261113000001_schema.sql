@@ -85,8 +85,8 @@ create table public.bank_items (
 );
 create index on public.bank_items (user_id);
 
--- secrets: never exposed through the API (schema "private" is not in the exposed schemas)
-create table private.plaid_items (
+-- secrets: RLS enabled with NO policies + grants revoked → only the service role (edge functions) can read them
+create table public.plaid_secrets (
   item_id uuid primary key references public.bank_items (id) on delete cascade,
   access_token text not null,
   sync_cursor text
