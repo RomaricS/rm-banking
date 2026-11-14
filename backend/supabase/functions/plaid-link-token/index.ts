@@ -19,7 +19,7 @@ serve(async (req, body) => {
     user: { client_user_id: userId },
     client_name: "akwe",
     language: plaidLanguage(locale),
-    country_codes: countries.length ? countries : ["US"],
+    country_codes: countries.length ? countries : SUPPORTED_COUNTRIES,
     webhook: Deno.env.get("PLAID_WEBHOOK_URL") ?? `${env("SUPABASE_URL")}/functions/v1/plaid-webhook`,
   };
   const redirect = Deno.env.get("PLAID_REDIRECT_URI");
