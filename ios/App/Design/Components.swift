@@ -127,6 +127,8 @@ struct Tag: View {
     var body: some View {
         Text(text)
             .font(.system(size: 11, weight: .bold))
+            .lineLimit(1)
+            .fixedSize()
             .padding(.horizontal, 7).padding(.vertical, 3)
             .foregroundStyle(color)
             .background(color.opacity(0.14), in: RoundedRectangle(cornerRadius: 6, style: .continuous))

@@ -276,15 +276,25 @@ struct TransactionRow: View {
 
         HStack(spacing: 12) {
             IconTile(systemName: icon, color: color)
-            VStack(alignment: .leading, spacing: 2) {
-                HStack(spacing: 6) {
+            VStack(alignment: .leading, spacing: 3) {
+                // Line 1: the merchant gets the width; "pending" is a compact clock, not a pill.
+                HStack(spacing: 5) {
                     Text(tx.title).font(.system(size: 15, weight: .semibold)).lineLimit(1)
-                    if tx.pending { Tag(text: tr("tx.pending")) }
+                    if tx.pending {
+                        Image(systemName: "clock")
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundStyle(Palette.text3)
+                            .accessibilityLabel(tr("tx.pending"))
+                    }
+                }
+                // Line 2: kind / excluded tags never wrap; the subtitle truncates instead.
+                HStack(spacing: 6) {
                     if let badge = tx.kind.badge { Tag(text: badge) }
                     if tx.excluded { Tag(text: tr("tx.excluded"), color: Palette.text3) }
+                    Text(subtitle(cat: cat, account: account)).font(.system(size: 13)).foregroundStyle(Palette.text2).lineLimit(1)
                 }
-                Text(subtitle(cat: cat, account: account)).font(.system(size: 13)).foregroundStyle(Palette.text2).lineLimit(1)
             }
+            .layoutPriority(1)
             Spacer(minLength: 8)
             VStack(alignment: .trailing, spacing: 2) {
                 AmountText(amount: tx.amount, currency: tx.currency, font: .system(size: 15, weight: .semibold), cents: true, signed: tx.amount > 0,
@@ -294,6 +304,7 @@ struct TransactionRow: View {
                     AmountText(amount: app.ledger.value(tx), currency: app.currency, font: .system(size: 12), cents: true, color: Palette.text3)
                 }
             }
+            .fixedSize()
         }
         .frame(minHeight: 60)
         .contentShape(Rectangle())
@@ -302,7 +313,11 @@ struct TransactionRow: View {
     private func subtitle(cat: AkweKit.TxCategory?, account: Account?) -> String {
         var parts: [String] = []
         if tx.kind.countsInStats { parts.append(cat?.name ?? tr("tx.uncategorized")) }
-        if showAccount, let a = account { parts.append("\(tx.paymentMethod == .other ? a.displayName : tx.paymentMethod.label) ··\(a.mask ?? "")") }
+        if showAccount, let a = account {
+            // Transfers / card payments already carry a kind tag, so name the account rather than repeat "Transfer".
+            let useAccountName = tx.paymentMethod == .other || tx.kind.badge != nil
+            parts.append("\(useAccountName ? a.displayName : tx.paymentMethod.label) ··\(a.mask ?? "")")
+        }
         return parts.joined(separator: " · ")
     }
 }
