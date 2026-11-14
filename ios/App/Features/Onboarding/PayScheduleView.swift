@@ -135,7 +135,7 @@ struct PayScheduleView: View {
                     .frame(minHeight: 60)
                     .contentShape(Rectangle())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.row)
                 .accessibilityAddTraits(frequency == f ? .isSelected : [])
             }
         }
@@ -163,7 +163,7 @@ struct PayScheduleView: View {
                 }
                 .contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.row)
 
             if editingNext {
                 DatePicker(tr("pay.next"), selection: nextBinding, in: nextRange, displayedComponents: .date)
@@ -189,7 +189,7 @@ struct PayScheduleView: View {
                             .frame(maxWidth: .infinity, minHeight: 44)
                             .background(on ? Palette.iris : Palette.text.opacity(0.05), in: Circle())
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.row)
                     .accessibilityLabel(tr("pay.dayA11y", d))
                     .accessibilityAddTraits(on ? .isSelected : [])
                 }

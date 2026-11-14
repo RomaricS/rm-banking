@@ -31,7 +31,7 @@ struct SettingsView: View {
                     .padding(.vertical, 4)
                     .contentShape(Rectangle())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.row)
                 .accessibilityHint(tr("settings.editName"))
             }
 
@@ -163,7 +163,7 @@ struct CurrencyView: View {
                             .background(app.currency == code ? Palette.iris.opacity(0.16) : Palette.card, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
                             .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).stroke(app.currency == code ? Palette.iris : .clear, lineWidth: 1.5))
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(.row)
                         .accessibilityAddTraits(app.currency == code ? .isSelected : [])
                     }
                 }

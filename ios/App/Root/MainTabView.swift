@@ -148,7 +148,7 @@ struct FloatingTabBar: View {
                         }
                     }
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.row)
                 // The selected pill keeps its natural width (icon + label + padding) so the text never
                 // touches its edges; the other tabs share the remaining space.
                 .fixedSize(horizontal: selection == t, vertical: false)

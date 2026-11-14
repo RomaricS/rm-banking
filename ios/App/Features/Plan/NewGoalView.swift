@@ -101,7 +101,7 @@ struct NewGoalView: View {
                                 .background(funding == f ? Palette.iris.opacity(0.14) : Palette.raised, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
                                 .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(funding == f ? Palette.iris : .clear, lineWidth: 1.5))
                             }
-                            .buttonStyle(.plain)
+                            .buttonStyle(.row)
                         }
                         if funding == .account {
                             Picker(tr("goal.account"), selection: $accountId) {
@@ -158,6 +158,6 @@ struct NewGoalView: View {
                 .background(dateChoice == i ? Palette.iris.opacity(0.16) : Palette.raised, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
                 .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(dateChoice == i ? Palette.iris : .clear, lineWidth: 1.5))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.row)
     }
 }

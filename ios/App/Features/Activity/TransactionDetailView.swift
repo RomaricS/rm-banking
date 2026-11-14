@@ -42,7 +42,7 @@ struct TransactionDetailView: View {
                         Button { newName = tx.title; renaming = true } label: {
                             HStack(spacing: 6) { Text(tx.title).font(.system(size: 17, weight: .semibold)); Image(systemName: "pencil").font(.system(size: 12)) }
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(.row)
                         Text("\(tx.date.long)\(tx.pending ? " · " + tr("tx.pending") : "")").font(.system(size: 14)).foregroundStyle(Palette.text2)
                     }
                     Spacer()
@@ -92,7 +92,7 @@ struct TransactionDetailView: View {
                             }
                         }
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.row)
                     .disabled(!tx.canCategorize)
                     Divider().overlay(Palette.stroke)
                     row(tr("tx.account")) { Text("\(account?.displayName ?? "") ··\(account?.mask ?? "")").fontWeight(.semibold) }

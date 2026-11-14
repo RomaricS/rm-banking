@@ -37,9 +37,16 @@ struct InsightsView: View {
                         .accessibilityLabel(tr("insights.previous"))
                     VStack(alignment: .leading, spacing: 4) {
                         Text(range.label).font(.system(size: 14)).foregroundStyle(Palette.text2)
-                        HStack(alignment: .firstTextBaseline, spacing: 10) {
-                            AmountText(amount: s.spent, currency: app.currency, font: .system(size: 40, weight: .heavy), cents: false)
-                            DeltaLabel(current: s.spent, previous: prevSpent, currency: app.currency)
+                        // Amount and "vs. last" side by side when they fit; otherwise the delta drops below.
+                        ViewThatFits(in: .horizontal) {
+                            HStack(alignment: .firstTextBaseline, spacing: 10) {
+                                AmountText(amount: s.spent, currency: app.currency, font: .system(size: 40, weight: .heavy), cents: false).fixedSize()
+                                DeltaLabel(current: s.spent, previous: prevSpent, currency: app.currency).fixedSize()
+                            }
+                            VStack(alignment: .leading, spacing: 2) {
+                                AmountText(amount: s.spent, currency: app.currency, font: .system(size: 40, weight: .heavy), cents: false)
+                                DeltaLabel(current: s.spent, previous: prevSpent, currency: app.currency)
+                            }
                         }
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -138,7 +145,7 @@ struct InsightsView: View {
                     }
                     .frame(minHeight: 44)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.row)
             }
         }
         .card()

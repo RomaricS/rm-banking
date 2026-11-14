@@ -74,7 +74,7 @@ struct GoalsList: View {
 
                 ForEach(Array(progress.enumerated()), id: \.element.goal.id) { i, p in
                     NavigationLink(value: Route.goal(p.goal.id)) { GoalCard(progress: p) }
-                        .buttonStyle(.plain)
+                        .buttonStyle(.row)
                         .rise(i)
                 }
 

@@ -65,7 +65,7 @@ struct ActivityView: View {
                         }
                         .card(padding: 12, radius: 18, fill: Palette.iris.opacity(0.14))
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.row)
                     .rise(0)
                 }
 
@@ -89,7 +89,7 @@ struct ActivityView: View {
                                 NavigationLink(value: Route.transaction(t.id)) {
                                     TransactionRow(tx: t).padding(.horizontal, 14)
                                 }
-                                .buttonStyle(.plain)
+                                .buttonStyle(.row)
                                 .contextMenu {
                                     Button { categorizing = t } label: { Label(tr("tx.changeCategory"), systemImage: "tag") }
                                     Button { Task { await app.setExcluded(t, !t.excluded) } } label: {

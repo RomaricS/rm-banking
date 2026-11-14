@@ -28,7 +28,7 @@ struct ManagePocketsView: View {
                     Label(tr("pockets.new"), systemImage: "plus").font(.system(size: 15, weight: .semibold)).frame(maxWidth: .infinity, minHeight: 52)
                         .background(RoundedRectangle(cornerRadius: 18).strokeBorder(Palette.text.opacity(0.2), style: StrokeStyle(lineWidth: 1.5, dash: [6, 4])))
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.row)
             }
             .padding(.horizontal, 16)
             .padding(.bottom, tabBarClearance)

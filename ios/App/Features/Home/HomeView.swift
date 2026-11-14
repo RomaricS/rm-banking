@@ -57,7 +57,7 @@ struct HomeView: View {
                 .padding(.horizontal, 14).frame(height: 40)
                 .background(Palette.text.opacity(0.12), in: Capsule())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.row)
             CircleIconButton(systemName: app.hideBalances ? "eye.slash" : "eye", label: tr("home.hideBalances"), fill: Palette.text.opacity(0.12)) {
                 withAnimation(Motion.smooth) { app.hideBalances.toggle() }
             }
@@ -87,7 +87,7 @@ struct HomeView: View {
                 .padding(.horizontal, 14).frame(height: 34)
                 .background(Palette.text.opacity(0.16), in: Capsule())
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.row)
         }
         .padding(.top, 18)
         .rise(0)
@@ -106,7 +106,7 @@ struct HomeView: View {
             }
             .card(padding: 14, radius: 18, fill: Palette.over.opacity(0.12))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.row)
     }
 
     private func payPeriodCard(_ safe: SafeToSpend) -> some View {
@@ -137,7 +137,7 @@ struct HomeView: View {
             .foregroundStyle(Palette.text)
             .card()
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.row)
     }
 
     private var accountsStrip: some View {
@@ -170,7 +170,7 @@ struct HomeView: View {
                             .frame(width: 140, height: 92, alignment: .leading)
                             .countedStyle(a.includeInTotals, fill: Palette.card, radius: Radius.tile)
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(.row)
                         .accessibilityValue(a.includeInTotals ? "" : tr("totals.leftOut"))
                     }
                     let hiddenCount = app.accounts.filter(\.isHidden).count
@@ -184,7 +184,7 @@ struct HomeView: View {
                             .frame(width: 92, height: 92)
                             .background(Palette.text.opacity(0.05), in: RoundedRectangle(cornerRadius: Radius.tile, style: .continuous))
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(.row)
                     }
                 }
             }
@@ -206,7 +206,7 @@ struct HomeView: View {
                 EmptyState(icon: "tray", title: tr("home.noTx"), message: tr("home.noTxHint"))
             }
             ForEach(recent) { t in
-                NavigationLink(value: Route.transaction(t.id)) { TransactionRow(tx: t) }.buttonStyle(.plain)
+                NavigationLink(value: Route.transaction(t.id)) { TransactionRow(tx: t) }.buttonStyle(.row)
             }
         }
         .card(padding: 16)

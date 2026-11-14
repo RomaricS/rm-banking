@@ -53,6 +53,8 @@ struct AmountText: View {
         Text(money(amount, currency, cents: cents, signed: signed))
             .font(font)
             .monospacedDigit()
+            .lineLimit(1)                // an amount never wraps onto a second line…
+            .minimumScaleFactor(0.5)     // …it shrinks to fit instead
             .foregroundStyle(color)
             .contentTransition(.numericText(value: amount.doubleValue))
             .animation(Motion.numbers, value: amount)
@@ -230,7 +232,7 @@ struct PillSegments<T: Hashable>: View {
                             }
                         }
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.row)
                 .accessibilityAddTraits(selection == o ? .isSelected : [])
             }
         }
@@ -251,6 +253,21 @@ struct PrimaryButtonStyle: ButtonStyle {
             .scaleEffect(configuration.isPressed ? 0.97 : 1)
             .animation(Motion.snappy, value: configuration.isPressed)
     }
+}
+
+/// Plain look for tappable rows and cards, but the *whole* label is the hit area (Spacers and gaps
+/// included). `.plain` only hit-tests the drawn text/icons, so taps between them were ignored.
+struct RowButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .contentShape(Rectangle())
+            .opacity(configuration.isPressed ? 0.6 : 1)
+            .animation(.easeOut(duration: 0.12), value: configuration.isPressed)
+    }
+}
+
+extension ButtonStyle where Self == RowButtonStyle {
+    static var row: RowButtonStyle { RowButtonStyle() }
 }
 
 struct SecondaryButtonStyle: ButtonStyle {
@@ -279,7 +296,7 @@ struct CircleIconButton: View {
                 .frame(width: 40, height: 40)
                 .background(fill, in: Circle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.row)
         .accessibilityLabel(label)
     }
 }

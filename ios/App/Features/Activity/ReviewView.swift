@@ -132,7 +132,7 @@ struct ReviewView: View {
                     .background(filled ? color : color.opacity(0.16), in: Circle())
                     .shadow(color: filled ? color.opacity(0.35) : .clear, radius: 14, y: 8)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.row)
             .accessibilityLabel(label)
             Text(label).font(.system(size: 13)).foregroundStyle(Palette.text2)
         }

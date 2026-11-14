@@ -75,7 +75,7 @@ struct LinkBanksView: View {
                         .padding(14)
                         .background(RoundedRectangle(cornerRadius: 20, style: .continuous).strokeBorder(Palette.iris.opacity(0.6), style: StrokeStyle(lineWidth: 1.5, dash: [6, 4])))
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.row)
                     .disabled(opening || app.isDemo)
                 }
 

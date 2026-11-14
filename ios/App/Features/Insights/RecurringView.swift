@@ -45,7 +45,7 @@ struct RecurringView: View {
                     VStack(spacing: 0) {
                         ForEach(Array(shown.enumerated()), id: \.element.id) { i, r in
                             if i > 0 { Divider().overlay(Palette.stroke).padding(.leading, 52) }
-                            Button { editing = r } label: { RecurringRow(stream: r) }.buttonStyle(.plain)
+                            Button { editing = r } label: { RecurringRow(stream: r) }.buttonStyle(.row)
                         }
                     }
                     .padding(.horizontal, 14)
@@ -62,7 +62,7 @@ struct RecurringView: View {
                     DisclosureGroup(isExpanded: $showHidden.animation(Motion.smooth)) {
                         VStack(spacing: 0) {
                             ForEach(hidden) { r in
-                                Button { editing = r } label: { RecurringRow(stream: r).leftOutContent(true) }.buttonStyle(.plain)
+                                Button { editing = r } label: { RecurringRow(stream: r).leftOutContent(true) }.buttonStyle(.row)
                             }
                         }
                         .padding(.top, 6)
@@ -368,13 +368,13 @@ struct BillsGlanceCard: View {
                         .font(.system(size: 14, weight: .semibold)).foregroundStyle(Palette.iris)
                         .frame(maxWidth: .infinity, alignment: .leading).padding(.vertical, 8)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.row)
             } else {
                 Text(tr("bills.glanceSummary", money(app.monthlyTotal(live), app.currency, cents: false), subs.count, live.count - subs.count))
                     .font(.system(size: 13)).foregroundStyle(Palette.text2)
                     .padding(.bottom, 2)
                 ForEach(next) { r in
-                    NavigationLink(value: Route.recurring) { RecurringRow(stream: r, compact: true) }.buttonStyle(.plain)
+                    NavigationLink(value: Route.recurring) { RecurringRow(stream: r, compact: true) }.buttonStyle(.row)
                 }
             }
         }

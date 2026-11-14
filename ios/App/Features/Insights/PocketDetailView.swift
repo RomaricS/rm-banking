@@ -97,7 +97,7 @@ struct PocketDetailView: View {
                         VStack(alignment: .leading, spacing: 0) {
                             Text(tr("pocket.transactions")).font(.system(size: 15, weight: .bold)).padding(.vertical, 6)
                             ForEach(txs.prefix(20)) { t in
-                                NavigationLink(value: Route.transaction(t.id)) { TransactionRow(tx: t) }.buttonStyle(.plain)
+                                NavigationLink(value: Route.transaction(t.id)) { TransactionRow(tx: t) }.buttonStyle(.row)
                             }
                         }
                         .card()

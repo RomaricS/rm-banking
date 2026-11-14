@@ -30,7 +30,7 @@ struct AccountsView: View {
                         Label(tr("link.addAnother"), systemImage: "plus").font(.system(size: 15, weight: .semibold)).frame(maxWidth: .infinity, minHeight: 52)
                             .background(RoundedRectangle(cornerRadius: 18).strokeBorder(Palette.iris.opacity(0.6), style: StrokeStyle(lineWidth: 1.5, dash: [6, 4])))
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.row)
                 }
 
                 VStack(alignment: .leading, spacing: 8) {
@@ -85,7 +85,7 @@ struct AccountsView: View {
                         .font(.system(size: 13, weight: .semibold)).foregroundStyle(Palette.text2)
                         .frame(minHeight: 32)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.row)
             }
             if let synced = item.lastSyncedAt {
                 Text(tr("accounts.synced", synced.formatted(.relative(presentation: .named)))).font(.system(size: 12)).foregroundStyle(Palette.text3)
@@ -128,7 +128,7 @@ struct AccountsView: View {
         }
         return VStack(alignment: .leading, spacing: 4) {
             Button { editing = a } label: { content.contentShape(Rectangle()) }
-                .buttonStyle(.plain)
+                .buttonStyle(.row)
                 .leftOutContent(!a.includeInTotals)
             HStack(spacing: 8) {
                 InTotalToggle(isOn: a.includeInTotals) { update(a) { $0.includeInTotals.toggle() } }

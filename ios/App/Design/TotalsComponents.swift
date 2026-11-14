@@ -37,7 +37,7 @@ struct StatusToggle: View {
             .frame(minHeight: 44) // touch target
             .contentShape(Rectangle())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.row)
         .accessibilityLabel(a11yLabel)
         .accessibilityValue(isOn ? onText : offText)
         .accessibilityAddTraits(.isToggle)
