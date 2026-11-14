@@ -1,0 +1,1 @@
+{ "applinks": { "details": [ { "appIDs": ["LU3XP79638.com.wakalo.akwe"], "components": [ { "/": "/plaid-oauth*" }, { "/": "/join*" } ] } ] } }

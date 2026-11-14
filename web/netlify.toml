@@ -1,0 +1,4 @@
+# Netlify site for akwe's universal links (Plaid OAuth return + shared-goal invites).
+# In Netlify: base directory = web, publish directory = web (or drag this folder onto app.netlify.com/drop).
+[build]
+  publish = "."

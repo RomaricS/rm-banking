@@ -2,43 +2,39 @@
 
 Checklist for switching akwe from Plaid Sandbox to real bank data. Nothing here is needed while developing on Sandbox.
 
-## 1. Link domain on GitHub Pages (free)
+## 1. Link domain on Netlify (free)
 
-Plaid's OAuth return (most EU banks, incl. La Banque Postale) needs an `https` URL that iOS recognises as belonging to the app. A GitHub Pages **user site** provides it for free.
+Plaid's OAuth return (most EU banks, incl. La Banque Postale) and shared-goal invite links need an `https` domain that iOS recognises as belonging to the app. The `web/` folder of this repo is that site, hosted free on Netlify at **`akwe-app.netlify.app`**.
 
-1. Create a public repo named exactly `<github-username>.github.io`.
-   A project site (`<username>.github.io/<repo>`) does **not** work: Apple only reads the file at the domain root.
-2. Add these files to the repo:
+What's in `web/`:
+- `.well-known/apple-app-site-association`: tells iOS that `/plaid-oauth*` and `/join*` open the app (`LU3XP79638.com.wakalo.akwe`).
+- `_headers`: serves that file as `application/json`.
+- `plaid-oauth/` and `join/`: fallback pages, only shown when the app isn't installed.
 
-   `.nojekyll` (empty; without it GitHub Pages skips the `.well-known` folder)
+Deploy it once:
+1. app.netlify.com › Add new site › Import an existing project › GitHub › `rm-banking`.
+2. Base directory `web`, build command empty, publish directory `web`. Deploy.
+3. Site configuration › Change site name › `akwe-app`.
+4. Check `https://akwe-app.netlify.app/.well-known/apple-app-site-association` returns the JSON.
 
-   `.well-known/apple-app-site-association` (no file extension; replace `TEAMID` with your 10-character Apple Team ID):
-   ```json
-   { "applinks": { "details": [ { "appIDs": ["TEAMID.com.wakalo.akwe"], "components": [ { "/": "/plaid-oauth*" }, { "/": "/join*" } ] } ] } }
-   ```
+Later pushes to `main` redeploy it automatically. If you'd rather not connect the repo, drag the `web` folder onto app.netlify.com/drop. Because it's a dot-folder, check that `.well-known` was uploaded.
 
-   `plaid-oauth/index.html` (fallback, only shown if the app isn't installed):
-   ```html
-   <!doctype html><meta charset="utf-8"><title>akwe</title><p>Return to the akwe app to finish connecting your bank.</p>
-   ```
-3. Repo Settings › Pages › deploy from the `main` branch.
-4. Check `https://<username>.github.io/.well-known/apple-app-site-association` returns the JSON.
-
-Then use `<username>.github.io` as the domain everywhere:
+The domain is used here:
 
 | Where | Value |
 |---|---|
-| Plaid Dashboard › Developers › API › Allowed redirect URIs | `https://<username>.github.io/plaid-oauth` |
-| `backend/supabase/functions/.env` | `PLAID_REDIRECT_URI=https://<username>.github.io/plaid-oauth` |
-| `backend/supabase/functions/.env` | `INVITE_BASE_URL=https://<username>.github.io/join` |
-| `ios/App/Config/Secrets.xcconfig` | `AKWE_LINK_DOMAIN = <username>.github.io` |
+| Plaid Dashboard › Developers › API › Allowed redirect URIs | `https://akwe-app.netlify.app/plaid-oauth` |
+| `backend/supabase/functions/.env` | `PLAID_REDIRECT_URI=https://akwe-app.netlify.app/plaid-oauth` |
+| `backend/supabase/functions/.env` | `INVITE_BASE_URL=https://akwe-app.netlify.app/join` |
+| `ios/App/Config/Secrets.xcconfig` | `AKWE_LINK_DOMAIN = akwe-app.netlify.app` |
 
-A custom domain (~$10/yr) can be added later in the same Pages settings; update the four values above and rebuild.
+If you change the site name or add a custom domain, update these four values, edit nothing in the AASA file, and rebuild.
 
 ## 2. Plaid production access
 
 1. Dashboard: complete the company profile and the security questionnaire, and request **Transactions** for the countries you need (US, CA, FR/EU). Approval for EU institutions can take time, so apply early.
-2. Copy the **Production** secret into `PLAID_SECRET` and set `PLAID_ENV=production`.
+2. Copy the **Production** secret into `PLAID_SECRET` and set `PLAID_ENV=production`. Put no comment on the same line: an inline `# …` becomes part of the value, and the backend then silently falls back to Sandbox.
+3. Leave `PLAID_SKIP_WEBHOOK_VERIFY` empty in production.
 
 ## 3. Push notifications
 
