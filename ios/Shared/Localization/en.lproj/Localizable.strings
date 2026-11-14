@@ -316,6 +316,7 @@
 "rule.hint" = "You moved it there twice. Applies to %ld past transactions too.";
 "rule.question" = "Always file %@ under %@?";
 "settings.accounts" = "Accounts & cards";
+"settings.addName" = "Add your first name";
 "settings.app" = "App";
 "settings.appearance" = "Appearance";
 "settings.currency" = "Display currency";
@@ -323,7 +324,9 @@
 "settings.deleteConfirm" = "Delete your account and all data?";
 "settings.deleteHint" = "Unlinks every bank and permanently deletes your data. Shared goals are handed to your partner.";
 "settings.demo" = "Demo mode · sample data";
+"settings.editName" = "Your first name";
 "settings.faceID" = "Face ID lock";
+"settings.firstName" = "First name";
 "settings.language" = "Language";
 "settings.meaning" = "money in Fongbe";
 "settings.money" = "Money";

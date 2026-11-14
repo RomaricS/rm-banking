@@ -120,12 +120,16 @@ final class AppModel {
         writeWidgetSnapshot()
     }
 
-    func signIn(idToken: String, nonce: String) async {
+    func signIn(idToken: String, nonce: String, givenName: String? = nil) async {
         guard let backend else { phase = .onboarding; return }
         do {
             try await backend.signInWithApple(idToken: idToken, nonce: nonce)
             userId = await backend.currentUserId()
             await load()
+            // Apple shares the name only on the very first sign-in; keep it if the profile has none.
+            if let givenName, !givenName.isEmpty, (profile?.displayName ?? "").isEmpty {
+                await setDisplayName(givenName)
+            }
             phase = profile?.onboardedAt == nil ? .onboarding : .ready
         } catch {
             show(error)
@@ -507,6 +511,21 @@ final class AppModel {
         guard let backend, let uid = userId else { return }
         struct U: Encodable { let displayCurrency: String }
         do { try await backend.update("profiles", id: uid, U(displayCurrency: code)) } catch { show(error) }
+    }
+
+    func setDisplayName(_ name: String) async {
+        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        let value: String? = trimmed.isEmpty ? nil : String(trimmed.prefix(40))
+        profile?.displayName = value
+        guard let backend, let uid = userId else { return }
+        struct U: Encodable { let displayName: String? }
+        do { try await backend.update("profiles", id: uid, U(displayName: value)) } catch { show(error) }
+    }
+
+    /// First name for greetings and the Settings header (profile name may be a full name).
+    var firstName: String? {
+        guard let n = profile?.displayName?.trimmingCharacters(in: .whitespaces), !n.isEmpty else { return nil }
+        return n.split(separator: " ").first.map(String.init)
     }
 
     func setPrefs(_ p: NotificationPrefs) async {

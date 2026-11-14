@@ -316,6 +316,7 @@
 "rule.hint" = "Vous l’avez déplacé deux fois. S’applique aussi à %ld opérations passées.";
 "rule.question" = "Toujours classer %@ dans %@ ?";
 "settings.accounts" = "Comptes et cartes";
+"settings.addName" = "Ajoutez votre prénom";
 "settings.app" = "Application";
 "settings.appearance" = "Apparence";
 "settings.currency" = "Devise d’affichage";
@@ -323,7 +324,9 @@
 "settings.deleteConfirm" = "Supprimer votre compte et toutes vos données ?";
 "settings.deleteHint" = "Déconnecte toutes vos banques et supprime définitivement vos données. Les objectifs partagés sont transmis à votre partenaire.";
 "settings.demo" = "Mode démo · données d’exemple";
+"settings.editName" = "Votre prénom";
 "settings.faceID" = "Verrouillage Face ID";
+"settings.firstName" = "Prénom";
 "settings.language" = "Langue";
 "settings.meaning" = "argent en fongbe";
 "settings.money" = "Argent";

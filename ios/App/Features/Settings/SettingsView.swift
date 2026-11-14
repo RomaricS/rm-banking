@@ -6,19 +6,33 @@ struct SettingsView: View {
     @State private var confirmDelete = false
     @State private var confirmSignOut = false
     @State private var editingSchedule = false
+    @State private var editingName = false
+    @State private var nameDraft = ""
 
     var body: some View {
         @Bindable var app = app
         List {
             Section {
-                HStack(spacing: 14) {
-                    CowrieMark(size: 48)
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(app.profile?.displayName ?? "akwe").font(.system(size: 17, weight: .bold))
-                        Text(app.isDemo ? tr("settings.demo") : tr("settings.signedInApple")).font(.system(size: 13)).foregroundStyle(Palette.text2)
+                Button {
+                    nameDraft = app.firstName ?? ""
+                    editingName = true
+                } label: {
+                    HStack(spacing: 14) {
+                        CowrieMark(size: 48)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(app.firstName ?? tr("settings.addName"))
+                                .font(.system(size: 17, weight: .bold))
+                                .foregroundStyle(app.firstName == nil ? Palette.text2 : Palette.text)
+                            Text(app.isDemo ? tr("settings.demo") : tr("settings.signedInApple")).font(.system(size: 13)).foregroundStyle(Palette.text2)
+                        }
+                        Spacer()
+                        Image(systemName: "pencil").font(.system(size: 14, weight: .semibold)).foregroundStyle(Palette.text3)
                     }
+                    .padding(.vertical, 4)
+                    .contentShape(Rectangle())
                 }
-                .padding(.vertical, 4)
+                .buttonStyle(.plain)
+                .accessibilityHint(tr("settings.editName"))
             }
 
             Section(tr("settings.money")) {
@@ -58,6 +72,14 @@ struct SettingsView: View {
         .scrollContentBackground(.hidden)
         .background(Palette.ground)
         .navigationTitle(tr("settings.title"))
+        .navigationBarTitleDisplayMode(.inline)
+        .alert(tr("settings.editName"), isPresented: $editingName) {
+            TextField(tr("settings.firstName"), text: $nameDraft)
+                .textContentType(.givenName)
+                .textInputAutocapitalization(.words)
+            Button(tr("common.cancel"), role: .cancel) {}
+            Button(tr("common.save")) { Task { await app.setDisplayName(nameDraft) } }
+        }
         .sheet(isPresented: $editingSchedule) { NavigationStack { PayScheduleView() } }
         .confirmationDialog(tr("settings.signOut"), isPresented: $confirmSignOut) {
             Button(tr("settings.signOut"), role: .destructive) { Task { await app.signOut() } }

@@ -30,7 +30,7 @@ struct WelcomeView: View {
                     guard case .success(let auth) = result,
                           let cred = auth.credential as? ASAuthorizationAppleIDCredential,
                           let tokenData = cred.identityToken, let token = String(data: tokenData, encoding: .utf8) else { return }
-                    Task { await app.signIn(idToken: token, nonce: nonce) }
+                    Task { await app.signIn(idToken: token, nonce: nonce, givenName: cred.fullName?.givenName) }
                 }
                 .signInWithAppleButtonStyle(scheme == .dark ? .white : .black)
                 .frame(height: 56)
