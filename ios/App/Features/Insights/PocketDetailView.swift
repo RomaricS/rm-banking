@@ -3,9 +3,12 @@ import Charts
 import AkweKit
 
 /// 3.2 Pocket detail — budget ring, last 6 periods, categories, merchants, transactions.
+/// Shows the period picked on Insights (kind + offset); budgets only apply to the current pay period.
 struct PocketDetailView: View {
     @Environment(AppModel.self) private var app
     let pocketId: UUID
+    var kind: PeriodKind = .payPeriod
+    var offset = 0
     @State private var editingBudget = false
 
     var body: some View {
@@ -17,12 +20,15 @@ struct PocketDetailView: View {
     private func content(_ pocket: Pocket) -> some View {
         let ledger = app.ledger
         let color = Color(hexString: pocket.color)
-        let range = app.schedule.period(containing: .today())
-        let s = ledger.summary(range, today: .today())
+        let today = Day.today()
+        let range = Periods.range(kind, containing: today, schedule: app.schedule, offset: offset)
+        let s = ledger.summary(range, today: offset == 0 ? today : range.end)
         let total = s.byPocket.first { $0.pocket.id == pocket.id }?.amount ?? 0
+        let showsBudget = kind == .payPeriod && offset == 0
         let budget = app.budgets.first { $0.pocketId == pocket.id }
-        let status = budget.map { ledger.budgetStatus($0) }
-        let hist = ledger.history(.payPeriod, count: 6, pocketId: pocket.id)
+        let status = showsBudget ? budget.map { ledger.budgetStatus($0) } : nil
+        let share = s.spent > 0 ? (total / s.spent).doubleValue : 0
+        let hist = ledger.history(kind, today: today, count: 6, offset: offset, pocketId: pocket.id)
         let avg = hist.dropLast().map(\.spent).reduce(0, +) / Decimal(max(1, hist.count - 1))
         let cats = s.byCategory.filter { $0.category.pocketId == pocket.id }
         let txs = ledger.statTransactions(in: range).filter { ledger.category($0.categoryId)?.pocketId == pocket.id }.sorted { $0.date > $1.date }
@@ -32,15 +38,16 @@ struct PocketDetailView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     HStack(spacing: 18) {
                         ZStack {
-                            RingProgress(fraction: status?.fraction ?? 0, color: status?.state == .over ? Palette.over : color, lineWidth: 12)
+                            // Current pay period with a budget: % of budget. Otherwise: share of the period's spending.
+                            RingProgress(fraction: status?.fraction ?? share, color: status?.state == .over ? Palette.over : color, lineWidth: 12)
                             VStack(spacing: 0) {
-                                Text(status.map { "\(Int(($0.fraction * 100).rounded()))%" } ?? "—").font(.system(size: 24, weight: .heavy))
-                                Text(tr("pocket.ofBudget")).font(.system(size: 12)).foregroundStyle(Palette.text2)
+                                Text("\(Int(((status?.fraction ?? share) * 100).rounded()))%").font(.system(size: 24, weight: .heavy))
+                                Text(tr(status != nil ? "pocket.ofBudget" : "pocket.ofSpending")).font(.system(size: 12)).foregroundStyle(Palette.text2)
                             }
                         }
                         .frame(width: 124, height: 124)
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(pocket.name).font(.system(size: 15, weight: .semibold))
+                            Text(range.label).font(.system(size: 15, weight: .semibold))
                             AmountText(amount: total, currency: app.currency, font: .system(size: 36, weight: .heavy), cents: false)
                             if let status {
                                 Text(tr("pocket.leftPerDay", money(status.limit, status.budget.currency, cents: false), money(status.remaining, status.budget.currency, cents: false), money(status.perDayLeft, status.budget.currency, cents: false)))
@@ -57,7 +64,7 @@ struct PocketDetailView: View {
 
                     VStack(alignment: .leading, spacing: 10) {
                         HStack {
-                            Text(tr("pocket.lastPeriods")).font(.system(size: 15, weight: .bold))
+                            Text(tr("pocket.last.\(kind.rawValue)")).font(.system(size: 15, weight: .bold))
                             Spacer()
                             Text(tr("pocket.avg", money(avg, app.currency, cents: false))).font(.system(size: 13)).foregroundStyle(Palette.text2)
                         }
@@ -78,7 +85,7 @@ struct PocketDetailView: View {
 
                     VStack(alignment: .leading, spacing: 4) {
                         ForEach(cats) { c in
-                            let catBudget = app.budgets.first { $0.categoryId == c.category.id }
+                            let catBudget = showsBudget ? app.budgets.first { $0.categoryId == c.category.id } : nil
                             VStack(alignment: .leading, spacing: 8) {
                                 HStack {
                                     Text(c.category.name).font(.system(size: 15, weight: .semibold))

@@ -126,9 +126,10 @@ public extension Ledger {
     }
 
     /// Spending for the last `count` periods (oldest first), for bar charts.
-    func history(_ kind: PeriodKind, today: Day = .today(), count: Int = 6, pocketId: UUID? = nil) -> [(range: DayRange, spent: Decimal)] {
+    /// The `count` periods ending with the one `offset` periods from now (0 = current).
+    func history(_ kind: PeriodKind, today: Day = .today(), count: Int = 6, offset: Int = 0, pocketId: UUID? = nil) -> [(range: DayRange, spent: Decimal)] {
         (0..<count).reversed().map { i in
-            let r = Periods.range(kind, containing: today, schedule: schedule, offset: -i)
+            let r = Periods.range(kind, containing: today, schedule: schedule, offset: offset - i)
             let s = summary(r, today: today)
             let v = pocketId.map { pid in s.byPocket.first { $0.pocket.id == pid }?.amount ?? 0 } ?? s.spent
             return (r, v)

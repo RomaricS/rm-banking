@@ -323,9 +323,13 @@
 "pocket.avg" = "moy. %@";
 "pocket.cool" = "%ld %% sous votre moyenne";
 "pocket.hot" = "%ld %% au-dessus de la moyenne";
-"pocket.lastPeriods" = "6 dernières paies";
+"pocket.last.month" = "6 derniers mois";
+"pocket.last.payPeriod" = "6 dernières paies";
+"pocket.last.week" = "6 dernières semaines";
+"pocket.last.year" = "6 dernières années";
 "pocket.leftPerDay" = "sur %@ · %@ restants · %@/jour";
 "pocket.ofBudget" = "du budget";
+"pocket.ofSpending" = "des dépenses";
 "pocket.transactions" = "Cette période";
 "pockets.categoryName" = "Nom de la catégorie";
 "pockets.color" = "Couleur";

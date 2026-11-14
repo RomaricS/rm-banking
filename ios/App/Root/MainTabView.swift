@@ -232,7 +232,7 @@ struct StrokeIcon: Shape {
 
 enum Route: Hashable {
     case transaction(UUID)
-    case pocket(UUID)
+    case pocket(UUID, PeriodKind = .payPeriod, offset: Int = 0)
     case managePockets
     case recurring
     case goal(UUID)
@@ -248,7 +248,7 @@ extension View {
         navigationDestination(for: Route.self) { route in
             switch route {
             case .transaction(let id): TransactionDetailView(id: id)
-            case .pocket(let id): PocketDetailView(pocketId: id)
+            case .pocket(let id, let kind, let offset): PocketDetailView(pocketId: id, kind: kind, offset: offset)
             case .managePockets: ManagePocketsView()
             case .recurring: RecurringView()
             case .goal(let id): GoalDetailView(goalId: id)

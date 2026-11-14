@@ -220,7 +220,11 @@ S = {
     "pocket.leftPerDay": ("of %@ · %@ left · %@/day", "sur %@ · %@ restants · %@/jour"),
     "pocket.hot": ("Running %ld%% hot vs. average", "%ld %% au-dessus de la moyenne"),
     "pocket.cool": ("%ld%% under your average", "%ld %% sous votre moyenne"),
-    "pocket.lastPeriods": ("Last 6 pay periods", "6 dernières paies"),
+    "pocket.ofSpending": ("of spending", "des dépenses"),
+    "pocket.last.payPeriod": ("Last 6 pay periods", "6 dernières paies"),
+    "pocket.last.month": ("Last 6 months", "6 derniers mois"),
+    "pocket.last.week": ("Last 6 weeks", "6 dernières semaines"),
+    "pocket.last.year": ("Last 6 years", "6 dernières années"),
     "pocket.avg": ("avg %@", "moy. %@"),
     "pocket.transactions": ("This period", "Cette période"),
     "pockets.title": ("Pockets", "Poches"),
@@ -481,7 +485,7 @@ INFO_PLIST = {
     "CFBundleDisplayName": ("akwe", "akwe"),
 }
 
-DYNAMIC_PREFIXES = ["method.", "tab.", "pay.", "period.", "plan.", "goal.funding.", "channel.", "widget.goalStatus.", "freq."]
+DYNAMIC_PREFIXES = ["pocket.last.", "method.", "tab.", "pay.", "period.", "plan.", "goal.funding.", "channel.", "widget.goalStatus.", "freq."]
 
 def escape(s):
     return s.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n")

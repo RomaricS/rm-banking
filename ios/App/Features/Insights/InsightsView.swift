@@ -131,7 +131,7 @@ struct InsightsView: View {
             .frame(height: 12)
             if s.byPocket.isEmpty { Text(tr("insights.noSpend")).font(.system(size: 14)).foregroundStyle(Palette.text2) }
             ForEach(s.byPocket) { p in
-                NavigationLink(value: Route.pocket(p.pocket.id)) {
+                NavigationLink(value: Route.pocket(p.pocket.id, kind, offset: offset)) {
                     HStack(spacing: 12) {
                         IconTile(systemName: p.pocket.icon, color: Color(hexString: p.pocket.color), size: 32, radius: 11)
                         Text(p.pocket.name).font(.system(size: 15, weight: .semibold)).foregroundStyle(Palette.text)
