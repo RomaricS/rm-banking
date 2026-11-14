@@ -69,3 +69,10 @@ extension TxKind {
 extension PayFrequency {
     var label: String { tr("pay.\(rawValue)") }
 }
+
+extension AkweKit.Transaction {
+    /// A transfer with no matching side in your linked accounts: money really went to (or came from) someone else.
+    var isOneSidedTransfer: Bool { kind == .transfer && transferPairId == nil }
+    /// Category can be set on real spending/income and on one-sided transfers (which then become spending/income).
+    var canCategorize: Bool { kind.countsInStats || isOneSidedTransfer }
+}

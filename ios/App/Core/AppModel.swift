@@ -284,12 +284,15 @@ final class AppModel {
     @discardableResult
     func setCategory(_ tx: Transaction, to categoryId: UUID) async -> String? {
         guard let i = transactions.firstIndex(where: { $0.id == tx.id }) else { return nil }
+        // Categorising a one-sided transfer (rent by e-Transfer, a benefit deposit) makes it real spending / income.
+        let kind: TxKind = tx.isOneSidedTransfer ? (tx.amount > 0 ? .income : .spend) : tx.kind
         transactions[i].categoryId = categoryId
         transactions[i].categorySource = .user
         transactions[i].needsReview = false
+        transactions[i].kind = kind
         writeWidgetSnapshot()
-        struct U: Encodable { let categoryId: UUID; let categorySource: String; let needsReview: Bool }
-        do { try await backend?.update("transactions", id: tx.id, U(categoryId: categoryId, categorySource: "user", needsReview: false)) } catch { show(error) }
+        struct U: Encodable { let categoryId: UUID; let categorySource: String; let needsReview: Bool; let kind: TxKind }
+        do { try await backend?.update("transactions", id: tx.id, U(categoryId: categoryId, categorySource: "user", needsReview: false, kind: kind)) } catch { show(error) }
 
         let key = MerchantNormalizer.key(tx.title)
         guard !rules.contains(where: { $0.merchantKey == key }) else { return nil }
@@ -336,7 +339,12 @@ final class AppModel {
         rules.append(rule)
         recategorizations[merchantKey] = nil
         var changed: [UUID] = []
+        var nowSpend: [UUID] = [], nowIncome: [UUID] = [] // one-sided transfers the rule turns into real money movements
         for i in transactions.indices where MerchantNormalizer.key(transactions[i].title) == merchantKey && transactions[i].categorySource != .user {
+            if transactions[i].isOneSidedTransfer {
+                if transactions[i].amount > 0 { transactions[i].kind = .income; nowIncome.append(transactions[i].id) }
+                else { transactions[i].kind = .spend; nowSpend.append(transactions[i].id) }
+            }
             transactions[i].categoryId = categoryId
             transactions[i].categorySource = .rule
             transactions[i].needsReview = false
@@ -351,6 +359,10 @@ final class AppModel {
             for chunk in stride(from: 0, to: changed.count, by: 200) {
                 let ids = changed[chunk..<min(chunk + 200, changed.count)].map(\.uuidString)
                 try await backend.client.from("transactions").update(U(categoryId: categoryId, categorySource: "rule", needsReview: false)).in("id", values: ids).execute()
+            }
+            struct K: Encodable { let kind: TxKind }
+            for (kind, ids) in [(TxKind.spend, nowSpend), (.income, nowIncome)] where !ids.isEmpty {
+                try await backend.client.from("transactions").update(K(kind: kind)).in("id", values: ids.map(\.uuidString)).execute()
             }
         } catch { show(error) }
         return changed.count

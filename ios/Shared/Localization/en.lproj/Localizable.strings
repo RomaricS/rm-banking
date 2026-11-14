@@ -375,6 +375,8 @@
 "tx.rename" = "Rename merchant";
 "tx.ruleCreated" = "Rule created · %ld transactions updated";
 "tx.split" = "Split";
+"tx.transferHintIn" = "Money from someone else, like a benefit? Pick a category and it counts as income.";
+"tx.transferHintOut" = "Paid someone, like rent? Pick a category and it counts as spending.";
 "tx.uncategorized" = "Uncategorized";
 "vis.hidden" = "Hidden";
 "vis.shown" = "Shown";

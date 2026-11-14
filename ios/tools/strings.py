@@ -134,6 +134,8 @@ S = {
     "activity.anyPocket": ("Any pocket", "Toutes les poches"),
     "activity.method": ("Paid with", "Moyen de paiement"),
     "activity.anyMethod": ("Any method", "Tous les moyens"),
+    "tx.transferHintOut": ("Paid someone, like rent? Pick a category and it counts as spending.", "Vous avez payé quelqu’un, comme le loyer ? Choisissez une catégorie et ce sera compté comme une dépense."),
+    "tx.transferHintIn": ("Money from someone else, like a benefit? Pick a category and it counts as income.", "De l’argent reçu de quelqu’un, comme une allocation ? Choisissez une catégorie et ce sera compté comme un revenu."),
     "tx.pending": ("Pending", "En attente"),
     "tx.excluded": ("Excluded", "Exclu"),
     "tx.uncategorized": ("Uncategorized", "Non catégorisé"),

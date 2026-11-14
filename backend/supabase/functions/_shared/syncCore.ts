@@ -200,6 +200,11 @@ export async function syncItem(admin: Admin, itemId: string, opts: { recurring?:
     const k = kinds.get(r.plaid_transaction_id);
     r.kind = k?.kind ?? "spend";
     r._pair = k?.pairId ?? null;
+    // A one-sided transfer the user (or their rule) gave a category is real spending/income:
+    // e.g. rent paid by Interac e-Transfer, or a benefit deposit. Don't flip it back to "transfer".
+    if (r.kind === "transfer" && !r._pair && (r.category_source === "user" || r.category_source === "rule")) {
+      r.kind = r.amount > 0 ? "income" : "spend";
+    }
     // Transfers / card payments don't need a spending category or review.
     if (r.kind === "transfer" || r.kind === "card_payment" || r.kind === "card_settlement") r.needs_review = false;
   }

@@ -96,6 +96,10 @@ enum DemoData {
         // transfers & card payment (not spending)
         add(-500, "To Savings ··12", nil, today.adding(days: -1), checking, method: .transfer, kind: .transfer)
         add(500, "From Checking ··21", nil, today.adding(days: -1), savings, method: .transfer, kind: .transfer)
+        // Own-account pair (locked) vs. a one-sided e-Transfer to someone else (categorisable).
+        let pairA = txs.count - 2, pairB = txs.count - 1
+        txs[pairA].transferPairId = txs[pairB].id; txs[pairB].transferPairId = txs[pairA].id
+        add(-75, "E Transfer Jordan Lee", nil, today.adding(days: -2), checking, method: .transfer, kind: .transfer)
         add(-842.40, "Harbor Card payment", nil, today.adding(days: -10), checking, method: .transfer, kind: .cardPayment)
         // things to review
         add(-41.99, "Amazon", shopping, today.adding(days: -1), card, method: .creditCard, review: true)

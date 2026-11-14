@@ -93,7 +93,7 @@ struct TransactionDetailView: View {
                         }
                     }
                     .buttonStyle(.plain)
-                    .disabled(!tx.kind.countsInStats)
+                    .disabled(!tx.canCategorize)
                     Divider().overlay(Palette.stroke)
                     row(tr("tx.account")) { Text("\(account?.displayName ?? "") ··\(account?.mask ?? "")").fontWeight(.semibold) }
                     Divider().overlay(Palette.stroke)
@@ -106,6 +106,13 @@ struct TransactionDetailView: View {
                 }
                 .padding(.horizontal, 14)
                 .background(Palette.card, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+
+                if tx.isOneSidedTransfer {
+                    // e.g. an Interac e-Transfer to the landlord: Plaid calls it a transfer, but the money left your world.
+                    Label(tr(tx.amount < 0 ? "tx.transferHintOut" : "tx.transferHintIn"), systemImage: "info.circle")
+                        .font(.system(size: 13)).foregroundStyle(Palette.text2)
+                        .padding(.horizontal, 4)
+                }
 
                 if let note = tx.note, !note.isEmpty {
                     Text(note).font(.system(size: 15)).card(padding: 14, radius: 18)

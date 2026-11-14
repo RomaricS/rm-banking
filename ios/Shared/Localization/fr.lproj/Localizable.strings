@@ -375,6 +375,8 @@
 "tx.rename" = "Renommer le marchand";
 "tx.ruleCreated" = "Règle créée · %ld opérations mises à jour";
 "tx.split" = "Répartir";
+"tx.transferHintIn" = "De l’argent reçu de quelqu’un, comme une allocation ? Choisissez une catégorie et ce sera compté comme un revenu.";
+"tx.transferHintOut" = "Vous avez payé quelqu’un, comme le loyer ? Choisissez une catégorie et ce sera compté comme une dépense.";
 "tx.uncategorized" = "Non catégorisé";
 "vis.hidden" = "Masqué";
 "vis.shown" = "Affiché";
