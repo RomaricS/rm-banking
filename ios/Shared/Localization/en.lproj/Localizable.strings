@@ -335,8 +335,10 @@
 "pockets.name" = "Name";
 "pockets.new" = "New pocket";
 "pockets.newCategory" = "New category";
+"pockets.renameCategory" = "Rename";
 "pockets.subtitle" = "Group categories into the big picture. Long-press a category to move it.";
 "pockets.title" = "Pockets";
+"pockets.unnamed" = "Unnamed category";
 "review.acceptAll" = "Accept all";
 "review.change" = "Swipe left · change";
 "review.done" = "All caught up";

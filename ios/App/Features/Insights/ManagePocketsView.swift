@@ -7,6 +7,7 @@ struct ManagePocketsView: View {
     @State private var editingPocket: Pocket?
     @State private var newCategoryPocket: Pocket?
     @State private var newName = ""
+    @State private var renaming: TxCategory?
     @State private var budgetFor: TxCategory?
     @State private var dropTarget: UUID?
 
@@ -39,13 +40,30 @@ struct ManagePocketsView: View {
         .sheet(item: $editingPocket) { p in PocketEditor(pocket: p, colors: Self.palette, icons: Self.icons) }
         .sheet(item: $budgetFor) { c in BudgetEditor(title: c.name, pocketId: nil, categoryId: c.id, current: app.budgets.first { $0.categoryId == c.id }?.amount) }
         .alert(tr("pockets.newCategory"), isPresented: Binding(get: { newCategoryPocket != nil }, set: { if !$0 { newCategoryPocket = nil } })) {
-            TextField(tr("pockets.categoryName"), text: $newName)
+            TextField(tr("pockets.categoryName"), text: $newName).textInputAutocapitalization(.sentences)
             Button(tr("common.add")) {
-                if let p = newCategoryPocket, !newName.isEmpty {
-                    Task { await app.saveCategory(TxCategory(id: UUID(), pocketId: p.id, name: newName, icon: p.icon, sort: 50)) }
+                // Read the name *now*: the Task runs after `newName` is cleared below.
+                let name = newName.trimmingCharacters(in: .whitespacesAndNewlines)
+                if let p = newCategoryPocket, !name.isEmpty {
+                    let sort = (app.categories.filter { $0.pocketId == p.id }.map(\.sort).max() ?? 0) + 1
+                    Task { await app.saveCategory(TxCategory(id: UUID(), pocketId: p.id, name: name, icon: p.icon, sort: sort)) }
                 }
                 newName = ""
             }
+            .disabled(newName.trimmingCharacters(in: .whitespaces).isEmpty)
+            Button(tr("common.cancel"), role: .cancel) { newName = "" }
+        }
+        .alert(tr("pockets.renameCategory"), isPresented: Binding(get: { renaming != nil }, set: { if !$0 { renaming = nil } })) {
+            TextField(tr("pockets.categoryName"), text: $newName).textInputAutocapitalization(.sentences)
+            Button(tr("common.save")) {
+                let name = newName.trimmingCharacters(in: .whitespacesAndNewlines)
+                if var c = renaming, !name.isEmpty {
+                    c.name = name
+                    Task { await app.saveCategory(c) }
+                }
+                newName = ""
+            }
+            .disabled(newName.trimmingCharacters(in: .whitespaces).isEmpty)
             Button(tr("common.cancel"), role: .cancel) { newName = "" }
         }
     }
@@ -71,7 +89,9 @@ struct ManagePocketsView: View {
 
             ForEach(cats) { c in
                 HStack(spacing: 12) {
-                    Text(c.name).font(.system(size: 15)).foregroundStyle(Palette.text)
+                    Text(c.name.isEmpty ? tr("pockets.unnamed") : c.name).font(.system(size: 15))
+                        .italic(c.name.isEmpty)
+                        .foregroundStyle(c.name.isEmpty ? Palette.text3 : Palette.text)
                     Spacer()
                     if let b = app.budgets.first(where: { $0.categoryId == c.id }) {
                         Text(money(b.amount, b.currency, cents: false)).font(.system(size: 13)).foregroundStyle(Palette.text2)
@@ -86,6 +106,7 @@ struct ManagePocketsView: View {
                         .background(Palette.raised, in: Capsule())
                 }
                 .contextMenu {
+                    Button { newName = c.name; renaming = c } label: { Label(tr("pockets.renameCategory"), systemImage: "pencil") }
                     Button { budgetFor = c } label: { Label(tr("budget.set"), systemImage: "gauge.with.dots.needle.33percent") }
                     Menu(tr("pockets.moveTo")) {
                         ForEach(app.pockets.filter { $0.id != p.id }) { other in

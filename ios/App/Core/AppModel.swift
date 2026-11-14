@@ -401,6 +401,8 @@ final class AppModel {
     }
 
     func saveCategory(_ category: TxCategory) async {
+        // Never store a nameless category (archiving one that already exists is fine).
+        guard category.archived || !category.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         if let i = categories.firstIndex(where: { $0.id == category.id }) { categories[i] = category } else { categories.append(category) }
         guard let backend, let uid = userId else { return }
         struct C: Encodable { let id: UUID; let userId: UUID; let pocketId: UUID; let name: String; let icon: String; let sort: Int; let archived: Bool }

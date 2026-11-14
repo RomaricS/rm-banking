@@ -226,6 +226,8 @@ S = {
     "pockets.title": ("Pockets", "Poches"),
     "pockets.subtitle": ("Group categories into the big picture. Long-press a category to move it.", "Regroupez vos catégories. Appui long sur une catégorie pour la déplacer."),
     "pockets.new": ("New pocket", "Nouvelle poche"),
+    "pockets.renameCategory": ("Rename", "Renommer"),
+    "pockets.unnamed": ("Unnamed category", "Catégorie sans nom"),
     "pockets.newCategory": ("New category", "Nouvelle catégorie"),
     "pockets.categoryName": ("Category name", "Nom de la catégorie"),
     "pockets.count": ("%ld categories", "%ld catégories"),

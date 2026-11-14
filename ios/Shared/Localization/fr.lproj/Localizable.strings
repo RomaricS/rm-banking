@@ -335,8 +335,10 @@
 "pockets.name" = "Nom";
 "pockets.new" = "Nouvelle poche";
 "pockets.newCategory" = "Nouvelle catégorie";
+"pockets.renameCategory" = "Renommer";
 "pockets.subtitle" = "Regroupez vos catégories. Appui long sur une catégorie pour la déplacer.";
 "pockets.title" = "Poches";
+"pockets.unnamed" = "Catégorie sans nom";
 "review.acceptAll" = "Tout valider";
 "review.change" = "Glisser à gauche · changer";
 "review.done" = "Tout est à jour";
