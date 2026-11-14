@@ -105,6 +105,7 @@ struct IconTile: View {
             .foregroundStyle(color)
             .frame(width: size, height: size)
             .background(color.opacity(0.15), in: RoundedRectangle(cornerRadius: radius, style: .continuous))
+            .contentShape(RoundedRectangle(cornerRadius: radius, style: .continuous)) // whole tile, when tappable
             .accessibilityHidden(true)
     }
 }
@@ -250,6 +251,7 @@ struct PrimaryButtonStyle: ButtonStyle {
             .foregroundStyle(foreground)
             .frame(maxWidth: .infinity, minHeight: 56)
             .background(fill, in: Capsule())
+            .contentShape(Capsule())   // the whole capsule is tappable, not just the text
             .scaleEffect(configuration.isPressed ? 0.97 : 1)
             .animation(Motion.snappy, value: configuration.isPressed)
     }
@@ -278,6 +280,7 @@ struct SecondaryButtonStyle: ButtonStyle {
             .padding(.horizontal, 16)
             .frame(minHeight: 44)
             .background(Palette.raised, in: Capsule())
+            .contentShape(Capsule())
             .scaleEffect(configuration.isPressed ? 0.96 : 1)
             .animation(Motion.snappy, value: configuration.isPressed)
     }

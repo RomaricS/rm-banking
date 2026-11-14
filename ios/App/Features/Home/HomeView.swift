@@ -46,6 +46,7 @@ struct HomeView: View {
                     .font(.system(size: 15, weight: .bold)).foregroundStyle(Palette.text)
                     .frame(width: 40, height: 40).background(Palette.text.opacity(0.16), in: Circle())
             }
+            .buttonStyle(.row)
             .accessibilityLabel(tr("settings.title"))
             Button { withAnimation(Motion.snappy) { tab = .activity } } label: {
                 HStack(spacing: 8) {
@@ -65,6 +66,7 @@ struct HomeView: View {
                 Image(systemName: "bell").font(.system(size: 16, weight: .semibold)).foregroundStyle(Palette.text)
                     .frame(width: 40, height: 40).background(Palette.text.opacity(0.12), in: Circle())
             }
+            .buttonStyle(.row)
             .accessibilityLabel(tr("alerts.title"))
         }
         .padding(.top, 8)
