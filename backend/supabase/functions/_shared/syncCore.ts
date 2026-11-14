@@ -237,7 +237,14 @@ export async function syncItem(admin: Admin, itemId: string, opts: { recurring?:
   await admin.from("plaid_secrets").update({ sync_cursor: cursor }).eq("item_id", itemId);
   await admin.from("bank_items").update({ status: "ok", error_code: null, last_synced_at: new Date().toISOString() }).eq("id", itemId);
 
-  if (opts.recurring || added.length > 0) await syncRecurring(admin, itemId, secret.access_token, userId, accountIdByPlaid, categories, rules).catch((e) => console.warn("recurring", e));
+  // Plaid needs a while after linking before recurring streams are ready (PRODUCT_NOT_READY), so keep
+  // asking on every sync until some exist, not only when new transactions arrive or the webhook fires.
+  const { count: streamCount } = await admin.from("recurring_streams").select("id", { count: "exact", head: true })
+    .eq("user_id", userId).eq("source", "plaid").in("account_id", [...accountIdByPlaid.values()]);
+  if (opts.recurring || added.length > 0 || (streamCount ?? 0) === 0) {
+    await syncRecurring(admin, itemId, secret.access_token, userId, accountIdByPlaid, categories, rules).catch((e) =>
+      e?.plaidCode === "PRODUCT_NOT_READY" ? console.log("recurring not ready yet") : console.warn("recurring", e));
+  }
   await maybeDetectPaySchedule(admin, userId).catch((e) => console.warn("payschedule", e));
 
   return { itemId, added: added.length, modified: modified.length, removed: removedIds.length, status: "ok" };
