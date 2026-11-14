@@ -9,7 +9,7 @@ import { HttpError, json, serve } from "../_shared/http.ts";
 import { adminClient, requireUser } from "../_shared/supabase.ts";
 import { checkGoalMilestones, notifyNow, refreshGoals } from "../_shared/notifyCore.ts";
 
-const INVITE_BASE = Deno.env.get("INVITE_BASE_URL") ?? "akwe://join";
+const INVITE_BASE = Deno.env.get("INVITE_BASE_URL") || "akwe://join";
 
 serve(async (req, body) => {
   const admin = adminClient();

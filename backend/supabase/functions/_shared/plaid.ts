@@ -27,6 +27,9 @@ export async function plaid<T = any>(path: string, body: Record<string, unknown>
   return data as T;
 }
 
+/** Where Plaid posts item events. PLAID_WEBHOOK_URL overrides; blank means "use our own function". */
+export const webhookUrl = () => Deno.env.get("PLAID_WEBHOOK_URL") || `${env("SUPABASE_URL")}/functions/v1/plaid-webhook`;
+
 /** Countries Plaid supports at all. */
 const PLAID_COUNTRIES = ["US", "CA", "GB", "FR", "ES", "IE", "NL", "DE", "IT", "PL", "DK", "NO", "SE", "EE", "LT", "LV", "PT", "BE", "AT", "FI"];
 

@@ -4,6 +4,15 @@ import { json, serve } from "../_shared/http.ts";
 import { adminClient, isServiceCall, requireUser } from "../_shared/supabase.ts";
 import { syncItem } from "../_shared/syncCore.ts";
 import { afterSync } from "../_shared/notifyCore.ts";
+import { plaid, webhookUrl } from "../_shared/plaid.ts";
+
+/** Points the item at our webhook (idempotent). Repairs banks linked while the URL was blank,
+ *  which never received Plaid's history / recurring updates. */
+async function ensureWebhook(admin: ReturnType<typeof adminClient>, itemId: string) {
+  const { data: secret } = await admin.from("plaid_secrets").select("access_token").eq("item_id", itemId).single();
+  if (!secret) return;
+  await plaid("/item/webhook/update", { access_token: secret.access_token, webhook: webhookUrl() }).catch(console.warn);
+}
 
 serve(async (req, body) => {
   const admin = adminClient();
@@ -26,6 +35,7 @@ serve(async (req, body) => {
   const { data: items } = await query;
   const results = [];
   for (const it of items ?? []) {
+    await ensureWebhook(admin, it.id);
     results.push(await syncItem(admin, it.id).catch((e) => ({ itemId: it.id, status: "error", error: String(e) })));
   }
   await afterSync(admin, userId).catch(console.warn);

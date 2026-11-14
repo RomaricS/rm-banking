@@ -31,7 +31,8 @@ export function serve(handler: (req: Request, body: Record<string, unknown>) => 
 }
 
 export function env(name: string, fallback?: string): string {
-  const v = Deno.env.get(name) ?? fallback;
+  // Empty counts as unset: a blank line in .env deploys as "" (not missing).
+  const v = Deno.env.get(name) || fallback;
   if (v === undefined) throw new Error(`missing env ${name}`);
   return v;
 }

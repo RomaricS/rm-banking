@@ -2,7 +2,7 @@
 // → { linkToken, expiration }. With itemId: "update mode" link token to repair a broken connection.
 import { env, HttpError, json, serve } from "../_shared/http.ts";
 import { adminClient, requireUser } from "../_shared/supabase.ts";
-import { plaid, plaidLanguage, SUPPORTED_COUNTRIES } from "../_shared/plaid.ts";
+import { plaid, plaidLanguage, SUPPORTED_COUNTRIES, webhookUrl } from "../_shared/plaid.ts";
 
 const MAX_BANKS = 4;
 
@@ -20,7 +20,7 @@ serve(async (req, body) => {
     client_name: "akwe",
     language: plaidLanguage(locale),
     country_codes: countries.length ? countries : SUPPORTED_COUNTRIES,
-    webhook: Deno.env.get("PLAID_WEBHOOK_URL") ?? `${env("SUPABASE_URL")}/functions/v1/plaid-webhook`,
+    webhook: webhookUrl(),
   };
   const redirect = Deno.env.get("PLAID_REDIRECT_URI");
   if (redirect) request.redirect_uri = redirect; // required for OAuth banks (most EU banks, some US/CA)
