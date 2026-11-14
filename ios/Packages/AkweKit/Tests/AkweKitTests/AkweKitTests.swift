@@ -217,6 +217,26 @@ final class PlanningTests: XCTestCase {
         XCTAssertEqual(p.status, .noDeadline)
     }
 
+    func testRecurringNextDueRollsForwardKeepingTheDay() {
+        let acct = UUID()
+        let rent = RecurringStream(accountId: acct, description: "Rent", averageAmount: 2250, lastAmount: 2250, currency: "CAD",
+                                   predictedNextDate: Day(2026, 1, 31), source: "manual")
+        XCTAssertEqual(rent.nextDue(onOrAfter: Day(2026, 2, 10)), Day(2026, 2, 28))   // clamped in Feb
+        XCTAssertEqual(rent.nextDue(onOrAfter: Day(2026, 3, 1)), Day(2026, 3, 31))    // back to the 31st
+        XCTAssertEqual(rent.nextDue(onOrAfter: Day(2026, 1, 31)), Day(2026, 1, 31))   // due today stays
+        var yearly = rent; yearly.frequency = "ANNUALLY"
+        XCTAssertEqual(yearly.nextDue(onOrAfter: Day(2027, 5, 1)), Day(2028, 1, 31))
+        var weekly = rent; weekly.frequency = "WEEKLY"; weekly.predictedNextDate = Day(2026, 11, 2)
+        XCTAssertEqual(weekly.nextDue(onOrAfter: Day(2026, 11, 13)), Day(2026, 11, 16))
+    }
+
+    func testHiddenRecurringIsLeftOutOfBills() {
+        var r = RecurringStream(accountId: nil, description: "Gym", averageAmount: 45, lastAmount: 45, currency: "USD", predictedNextDate: .today().adding(days: 1))
+        XCTAssertTrue(r.isLive)
+        r.hidden = true
+        XCTAssertFalse(r.isLive)
+    }
+
     func testWidgetSnapshot() {
         let l = Fixture.ledger([Fixture.tx(-412, Fixture.groceries, Day(2026, 11, 9))])
         let w = l.widgetSnapshot(hideBalances: false, today: Fixture.today)

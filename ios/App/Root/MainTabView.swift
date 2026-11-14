@@ -32,6 +32,7 @@ struct MainTabView: View {
         case "accounts": path.append(Route.accounts)
         case "review": path.append(Route.review)
         case "settings": path.append(Route.settings)
+        case "recurring": path.append(Route.recurring)
         default: break
         }
         #endif
@@ -50,7 +51,13 @@ struct MainTabView: View {
             }
         }
         .ignoresSafeArea(.keyboard)
-        .task { await AppDelegate.requestPushPermission() }
+        .task {
+            #if DEBUG
+            // Screenshot runs (-AkweTab / -AkweRoute) skip the system prompt so it doesn't cover the screen.
+            if UserDefaults.standard.string(forKey: "AkweTab") != nil || UserDefaults.standard.string(forKey: "AkweRoute") != nil { return }
+            #endif
+            await AppDelegate.requestPushPermission()
+        }
     }
 
     /// iOS 26+: the system tab bar (Liquid Glass) — floating glass capsule, native selection morph,

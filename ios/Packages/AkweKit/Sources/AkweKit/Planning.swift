@@ -74,9 +74,10 @@ public extension Ledger {
     func safeToSpend(today: Day = .today()) -> SafeToSpend {
         let range = schedule.period(containing: today)
         let s = summary(range, today: today)
-        let upcoming = recurring.filter { r in
-            guard r.isActive, r.isOutflow, let next = r.predictedNextDate else { return false }
-            return next > today && next <= range.end
+        let upcoming = recurring.compactMap { r -> RecurringStream? in
+            guard r.isLive, r.isOutflow, let next = r.nextDue(onOrAfter: today.adding(days: 1)), next <= range.end else { return nil }
+            var r = r; r.predictedNextDate = next
+            return r
         }
         let bills = upcoming.reduce(Decimal(0)) { $0 + rates.convert($1.lastAmount, from: $1.currency, to: currency) }
         let avg = averageCumulative(.payPeriod, today: today)

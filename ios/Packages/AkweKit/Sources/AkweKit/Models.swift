@@ -208,7 +208,7 @@ public struct Rule: Codable, Hashable, Identifiable, Sendable {
 
 public struct RecurringStream: Codable, Hashable, Identifiable, Sendable {
     public var id: UUID
-    public var accountId: UUID
+    public var accountId: UUID?
     public var direction: String
     public var description: String
     public var merchantName: String?
@@ -221,11 +221,42 @@ public struct RecurringStream: Codable, Hashable, Identifiable, Sendable {
     public var predictedNextDate: Day?
     public var isActive: Bool
     public var categoryId: UUID?
-    public init(id: UUID = UUID(), accountId: UUID, direction: String = "outflow", description: String, merchantName: String? = nil, frequency: String = "MONTHLY", averageAmount: Decimal, lastAmount: Decimal, previousAmount: Decimal? = nil, currency: String, lastDate: Day? = nil, predictedNextDate: Day? = nil, isActive: Bool = true, categoryId: UUID? = nil) {
+    /// "plaid" (detected) or "manual" (added by the user). Optional so older caches still decode.
+    public var source: String?
+    /// "subscription" | "bill"; nil = decided by the app.
+    public var kind: String?
+    public var categoryLocked: Bool?
+    public var hidden: Bool?
+    public init(id: UUID = UUID(), accountId: UUID?, direction: String = "outflow", description: String, merchantName: String? = nil, frequency: String = "MONTHLY", averageAmount: Decimal, lastAmount: Decimal, previousAmount: Decimal? = nil, currency: String, lastDate: Day? = nil, predictedNextDate: Day? = nil, isActive: Bool = true, categoryId: UUID? = nil, source: String = "plaid", kind: String? = nil, categoryLocked: Bool = false, hidden: Bool = false) {
         self.id = id; self.accountId = accountId; self.direction = direction; self.description = description
         self.merchantName = merchantName; self.frequency = frequency; self.averageAmount = averageAmount
         self.lastAmount = lastAmount; self.previousAmount = previousAmount; self.currency = currency
         self.lastDate = lastDate; self.predictedNextDate = predictedNextDate; self.isActive = isActive; self.categoryId = categoryId
+        self.source = source; self.kind = kind; self.categoryLocked = categoryLocked; self.hidden = hidden
+    }
+    public var isManual: Bool { source == "manual" }
+    public var isHidden: Bool { hidden ?? false }
+    /// Shown in lists and counted in plans.
+    public var isLive: Bool { isActive && !isHidden }
+
+    /// Next due date on or after `today`. Manual entries have no bank feed, and Plaid's prediction
+    /// can lag, so a past date is rolled forward by the frequency.
+    public func nextDue(onOrAfter today: Day) -> Day? {
+        guard let start = predictedNextDate else { return nil }
+        var d = start
+        var k = 0
+        // Steps are counted from the original date so the 31st stays the 31st (Feb → 28th, Mar → 31st).
+        while d < today && k < 1000 {
+            k += 1
+            switch frequency.uppercased() {
+            case "WEEKLY": d = start.adding(days: 7 * k)
+            case "BIWEEKLY": d = start.adding(days: 14 * k)
+            case "SEMI_MONTHLY": d = start.adding(days: 15 * k)
+            case "ANNUALLY": d = Day.clamped(start.year + k, start.month, start.day)
+            default: d = Day.clamped(start.year, start.month + k, start.day)
+            }
+        }
+        return d
     }
     public var title: String { merchantName ?? description }
     public var isOutflow: Bool { direction == "outflow" }

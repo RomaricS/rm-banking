@@ -19,7 +19,8 @@ struct HomeView: View {
                     if let broken = app.itemsNeedingAttention.first { reauthBanner(broken) }
                     payPeriodCard(safe).rise(1)
                     accountsStrip.rise(2)
-                    recentCard(recent).rise(3)
+                    BillsGlanceCard().rise(3)
+                    recentCard(recent).rise(4)
                 }
                 .padding(.horizontal, 16)
                 .padding(.bottom, tabBarClearance)

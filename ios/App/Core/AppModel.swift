@@ -293,6 +293,7 @@ final class AppModel {
         writeWidgetSnapshot()
         struct U: Encodable { let categoryId: UUID; let categorySource: String; let needsReview: Bool; let kind: TxKind }
         do { try await backend?.update("transactions", id: tx.id, U(categoryId: categoryId, categorySource: "user", needsReview: false, kind: kind)) } catch { show(error) }
+        await syncStreamCategory(from: tx, to: categoryId)
 
         let key = MerchantNormalizer.key(tx.title)
         guard !rules.contains(where: { $0.merchantKey == key }) else { return nil }
@@ -351,6 +352,7 @@ final class AppModel {
             changed.append(transactions[i].id)
         }
         writeWidgetSnapshot()
+        await applyRuleToStreams(merchantKey: merchantKey, categoryId: categoryId)
         guard let backend, let uid = userId else { return changed.count }
         struct R: Encodable { let id: UUID; let userId: UUID; let merchantKey: String; let categoryId: UUID }
         struct U: Encodable { let categoryId: UUID; let categorySource: String; let needsReview: Bool }

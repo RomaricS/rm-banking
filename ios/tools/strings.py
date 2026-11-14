@@ -237,12 +237,45 @@ S = {
     "bills.dueBefore": ("Due before payday · %@", "À payer avant la paie · %@"),
     "bills.covered": ("Covered · %@ has %@", "Couvert · %@ dispose de %@"),
     "bills.short": ("%@ looks short — check before payday", "%@ semble juste — vérifiez avant la paie"),
-    "bills.noneTitle": ("Nothing due before payday", "Rien à payer avant la paie"),
-    "bills.noneHint": ("Recurring bills show up here once detected.", "Les factures récurrentes apparaissent ici une fois détectées."),
     "bills.subscriptions": ("Subscriptions", "Abonnements"),
-    "bills.subsSummary": ("%ld active · %@/mo", "%ld actifs · %@/mois"),
     "bills.priceUp": ("%@ went up %@ · now %@", "%@ a augmenté de %@ · désormais %@"),
     "bills.perMonth": ("%@/mo", "%@/mois"),
+    "bills.subsTab": ("Subscriptions · %ld", "Abonnements · %ld"),
+    "bills.billsTab": ("Bills · %ld", "Factures · %ld"),
+    "bills.billsLabel": ("Bills", "Factures"),
+    "bills.everyMonth": ("Every month", "Chaque mois"),
+    "bills.noSubs": ("No subscriptions yet", "Aucun abonnement pour l’instant"),
+    "bills.noBills": ("No bills yet", "Aucune facture pour l’instant"),
+    "bills.addHint": ("Detected ones appear automatically. Missing one? Add it.", "Ceux détectés apparaissent automatiquement. Il en manque un ? Ajoutez-le."),
+    "bills.addSub": ("Add a subscription", "Ajouter un abonnement"),
+    "bills.addBill": ("Add a bill", "Ajouter une facture"),
+    "bills.add": ("Add bill or subscription", "Ajouter une facture ou un abonnement"),
+    "bills.hiddenSection": ("Hidden · %ld", "Masqués · %ld"),
+    "bills.manual": ("Added by you", "Ajouté par vous"),
+    "bills.dueToday": ("due today", "à payer aujourd’hui"),
+    "bills.dueTomorrow": ("due tomorrow", "à payer demain"),
+    "bills.nextOn": ("next %@", "prochain le %@"),
+    "bills.name": ("Name", "Nom"),
+    "bills.type": ("Type", "Type"),
+    "bills.subscriptionOne": ("Subscription", "Abonnement"),
+    "bills.billOne": ("Bill", "Facture"),
+    "bills.amount": ("Amount", "Montant"),
+    "bills.frequency": ("Repeats", "Fréquence"),
+    "bills.nextPayment": ("Next payment", "Prochain paiement"),
+    "bills.detectedFooter": ("Detected from your bank. Amount and dates update with each sync.", "Détecté depuis votre banque. Le montant et les dates se mettent à jour à chaque synchronisation."),
+    "bills.paidFrom": ("Paid from", "Payé depuis"),
+    "bills.noAccount": ("Not set", "Non défini"),
+    "bills.categoryFooter": ("Changing a transaction’s category for this merchant updates it here too.", "Changer la catégorie d’une transaction de ce marchand la met aussi à jour ici."),
+    "bills.hide": ("Hide", "Masquer"),
+    "bills.unhide": ("Show again", "Afficher à nouveau"),
+    "bills.hideFooter": ("Hidden items stop counting toward bills due before payday.", "Les éléments masqués ne comptent plus dans les factures à payer avant la paie."),
+    "bills.deleteConfirm": ("Delete %@?", "Supprimer %@ ?"),
+    "bills.glanceEmpty": ("Add your subscriptions and bills", "Ajoutez vos abonnements et factures"),
+    "bills.glanceSummary": ("%@/mo · %ld subscriptions · %ld bills", "%@/mois · %ld abonnements · %ld factures"),
+    "freq.weekly": ("Weekly", "Chaque semaine"),
+    "freq.biweekly": ("Every 2 weeks", "Toutes les 2 semaines"),
+    "freq.monthly": ("Monthly", "Chaque mois"),
+    "freq.annually": ("Yearly", "Chaque année"),
 
     # plan / goals
     "plan.goals": ("Goals", "Objectifs"),
@@ -446,7 +479,7 @@ INFO_PLIST = {
     "CFBundleDisplayName": ("akwe", "akwe"),
 }
 
-DYNAMIC_PREFIXES = ["method.", "tab.", "pay.", "period.", "plan.", "goal.funding.", "channel.", "widget.goalStatus."]
+DYNAMIC_PREFIXES = ["method.", "tab.", "pay.", "period.", "plan.", "goal.funding.", "channel.", "widget.goalStatus.", "freq."]
 
 def escape(s):
     return s.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n")

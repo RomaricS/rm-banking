@@ -110,12 +110,13 @@ enum DemoData {
         add(-18.20, "Uber", rideshare, today, card, method: .creditCard)
 
         let recurring = [
-            RecurringStream(accountId: checking.id, description: "Rent (my share)", averageAmount: 850, lastAmount: 850, currency: "USD", predictedNextDate: today.adding(days: 1)),
-            RecurringStream(accountId: card.id, description: "Phone", averageAmount: 64, lastAmount: 64, currency: "USD", predictedNextDate: today.adding(days: 4)),
-            RecurringStream(accountId: card.id, description: "Gym", averageAmount: 45, lastAmount: 45, currency: "USD", predictedNextDate: today.adding(days: 4)),
-            RecurringStream(accountId: card.id, description: "Netflix", averageAmount: 15.49, lastAmount: 15.49, previousAmount: 13.49, currency: "USD", predictedNextDate: today.adding(days: 5)),
-            RecurringStream(accountId: card.id, description: "Spotify", averageAmount: 11.99, lastAmount: 11.99, currency: "USD", predictedNextDate: today.adding(days: 28)),
-            RecurringStream(accountId: checking.id, description: "Electric Co.", averageAmount: 112.4, lastAmount: 112.4, currency: "USD", predictedNextDate: today.adding(days: 26)),
+            RecurringStream(accountId: checking.id, description: "Rent (my share)", averageAmount: 850, lastAmount: 850, currency: "USD", predictedNextDate: today.adding(days: 1), categoryId: rent.id),
+            RecurringStream(accountId: card.id, description: "Phone", averageAmount: 64, lastAmount: 64, currency: "USD", predictedNextDate: today.adding(days: 4), categoryId: internet.id),
+            RecurringStream(accountId: card.id, description: "Gym", averageAmount: 45, lastAmount: 45, currency: "USD", predictedNextDate: today.adding(days: 4), categoryId: fitness.id),
+            RecurringStream(accountId: card.id, description: "Netflix", averageAmount: 15.49, lastAmount: 15.49, previousAmount: 13.49, currency: "USD", predictedNextDate: today.adding(days: 5), categoryId: subscriptions.id),
+            RecurringStream(accountId: card.id, description: "Spotify", averageAmount: 11.99, lastAmount: 11.99, currency: "USD", predictedNextDate: today.adding(days: 28), categoryId: subscriptions.id),
+            RecurringStream(accountId: nil, description: "Car insurance", frequency: "ANNUALLY", averageAmount: 1140, lastAmount: 1140, currency: "USD", predictedNextDate: today.adding(days: 40), source: "manual", kind: "bill"),
+            RecurringStream(accountId: checking.id, description: "Electric Co.", averageAmount: 112.4, lastAmount: 112.4, currency: "USD", predictedNextDate: today.adding(days: 26), categoryId: utilities.id),
         ]
         let budgets = [
             Budget(pocketId: food.id, amount: 800, currency: "USD"),

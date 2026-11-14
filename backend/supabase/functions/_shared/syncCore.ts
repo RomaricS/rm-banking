@@ -275,12 +275,15 @@ async function syncRecurring(
       updated_at: new Date().toISOString(),
     };
   });
-  // keep the previous amount to detect price increases
-  const { data: prev } = await admin.from("recurring_streams").select("plaid_stream_id, last_amount").eq("user_id", userId);
-  const prevMap = new Map((prev ?? []).map((p: any) => [p.plaid_stream_id, Number(p.last_amount)]));
+  // keep the previous amount to detect price increases, and categories the user picked
+  const { data: prev } = await admin.from("recurring_streams").select("plaid_stream_id, last_amount, category_id, category_locked")
+    .eq("user_id", userId).eq("source", "plaid");
+  const prevMap = new Map((prev ?? []).map((p: any) => [p.plaid_stream_id, p]));
   for (const r of rows) {
     const old = prevMap.get(r.plaid_stream_id);
-    if (old !== undefined && Math.abs(old - r.last_amount) > 0.009) r.previous_amount = old;
+    if (!old) continue;
+    if (Math.abs(Number(old.last_amount) - r.last_amount) > 0.009) r.previous_amount = Number(old.last_amount);
+    if (old.category_locked) r.category_id = old.category_id;
   }
   if (rows.length) await admin.from("recurring_streams").upsert(rows, { onConflict: "plaid_stream_id" });
 }

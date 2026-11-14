@@ -20,6 +20,7 @@ const T: Record<Lang, Record<string, (p: Record<string, string>) => string>> = {
     budgetOverBody: (p) => `${p.spent} of ${p.limit} this period.`,
     billTitle: (p) => `${p.name} due tomorrow`,
     billBody: (p) => `${p.amount} from ${p.account}${p.covered === "1" ? " — balance covers it." : " — balance looks short."}`,
+    billBodyNoAccount: (p) => `${p.amount} due tomorrow.`,
     paydayTitle: () => "Payday summary",
     paydayBody: (p) => `Last period you spent ${p.spent} and kept ${p.rate}% of your income.`,
     reauthTitle: (p) => `Reconnect ${p.bank}`,
@@ -40,6 +41,7 @@ const T: Record<Lang, Record<string, (p: Record<string, string>) => string>> = {
     budgetOverBody: (p) => `${p.spent} sur ${p.limit} cette période.`,
     billTitle: (p) => `${p.name} prélevé demain`,
     billBody: (p) => `${p.amount} sur ${p.account}${p.covered === "1" ? " — le solde suffit." : " — le solde semble juste."}`,
+    billBodyNoAccount: (p) => `${p.amount} à payer demain.`,
     paydayTitle: () => "Bilan de la paie",
     paydayBody: (p) => `La période dernière, vous avez dépensé ${p.spent} et gardé ${p.rate} % de vos revenus.`,
     reauthTitle: (p) => `Reconnectez ${p.bank}`,
@@ -207,6 +209,32 @@ export async function evaluateBudgets(admin: Admin, userId: string, rates?: Rate
   }
 }
 
+/** Manual bills have no bank feed: once a due date passes, move it to the next occurrence. */
+export function nextOccurrence(date: string, frequency: string, today: string): string {
+  let d = new Date(date + "T00:00:00Z");
+  const t = new Date(today + "T00:00:00Z");
+  const step = (x: Date) => {
+    const n = new Date(x);
+    switch (frequency.toUpperCase()) {
+      case "WEEKLY": n.setUTCDate(n.getUTCDate() + 7); break;
+      case "BIWEEKLY": n.setUTCDate(n.getUTCDate() + 14); break;
+      case "ANNUALLY": n.setUTCFullYear(n.getUTCFullYear() + 1); break;
+      default: n.setUTCMonth(n.getUTCMonth() + 1);
+    }
+    return n;
+  };
+  for (let i = 0; i < 1000 && d < t; i++) d = step(d);
+  return d.toISOString().slice(0, 10);
+}
+
+async function rollManualRecurring(admin: Admin, userId: string, today: string) {
+  const { data } = await admin.from("recurring_streams").select("id, predicted_next_date, frequency")
+    .eq("user_id", userId).eq("source", "manual").lt("predicted_next_date", today);
+  for (const r of data ?? []) {
+    await admin.from("recurring_streams").update({ predicted_next_date: nextOccurrence(r.predicted_next_date, r.frequency, today) }).eq("id", r.id);
+  }
+}
+
 /** Everything that should run after a sync for one user. */
 export async function afterSync(admin: Admin, userId: string) {
   const rates = await latestRates(admin);
@@ -217,15 +245,18 @@ export async function afterSync(admin: Admin, userId: string) {
 // --------------------------------------------------------------------------- daily
 export async function dailyForUser(admin: Admin, userId: string, today = new Date().toISOString().slice(0, 10)) {
   const tomorrow = new Date(Date.parse(today) + 86_400_000).toISOString().slice(0, 10);
+  await rollManualRecurring(admin, userId, today);
   const { data: bills } = await admin.from("recurring_streams")
-    .select("id, merchant_name, description, last_amount, currency, account_id, accounts!inner(name, nickname, available_balance, current_balance)")
-    .eq("user_id", userId).eq("direction", "outflow").eq("is_active", true).eq("predicted_next_date", tomorrow);
+    .select("id, merchant_name, description, last_amount, currency, account_id, accounts(name, nickname, available_balance, current_balance)")
+    .eq("user_id", userId).eq("direction", "outflow").eq("is_active", true).eq("hidden", false).eq("predicted_next_date", tomorrow);
   for (const b of bills ?? []) {
-    const acc = (b as any).accounts;
-    const bal = Number(acc.available_balance ?? acc.current_balance ?? 0);
+    const acc = (b as any).accounts; // null for a manual entry without an account
+    const bal = acc ? Number(acc.available_balance ?? acc.current_balance ?? 0) : null;
     await notifyOnce(admin, userId, "bills_due", "bill_due", b.id, tomorrow, (lang, t) => ({
       title: t.billTitle({ name: b.merchant_name ?? b.description }),
-      body: t.billBody({ amount: money(Number(b.last_amount), b.currency, lang), account: acc.nickname ?? acc.name, covered: bal >= Number(b.last_amount) ? "1" : "0" }),
+      body: acc
+        ? t.billBody({ amount: money(Number(b.last_amount), b.currency, lang), account: acc.nickname ?? acc.name, covered: (bal ?? 0) >= Number(b.last_amount) ? "1" : "0" })
+        : t.billBodyNoAccount({ amount: money(Number(b.last_amount), b.currency, lang) }),
       category: "BILL_DUE", data: { streamId: b.id },
     }));
   }
